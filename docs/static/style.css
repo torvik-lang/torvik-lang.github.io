@@ -1,0 +1,129 @@
+/* Torvik website - palette drawn from the brand runestone art:
+   granite blue-greys #1B222C / #2B3440 / #333D49 / #434E5B / #5E6B79 / #8B99A8 / #A7B4C2
+   runestone red-ochre #9E2C20 / #B23A2E / #D24A38 / #E86A57 */
+
+:root {
+  --stone-deep:  #1B222C;
+  --stone:       #2B3440;
+  --stone-mid:   #333D49;
+  --stone-line:  #434E5B;
+  --mist:        #8B99A8;
+  --pale:        #A7B4C2;
+  --ink:         #D3DCE6;
+  --ochre:       #D24A38;
+  --ochre-hi:    #E86A57;
+  --ochre-deep:  #9E2C20;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--stone-deep);
+  color: var(--ink);
+  font: 17px/1.7 Georgia, 'Times New Roman', serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 3px double var(--stone-line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--pale);
+  font-size: 1.45rem;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+.brand img { display: block; }
+
+nav { display: flex; flex-wrap: wrap; gap: 1.1rem; }
+nav a {
+  color: var(--mist);
+  text-decoration: none;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+nav a:hover { color: var(--ochre-hi); }
+
+main {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 3rem;
+}
+
+h1, h2, h3, h4, h5, h6 { color: var(--pale); line-height: 1.25; }
+h1 { font-size: 2.1rem; margin-top: 0.5rem; }
+h2 {
+  font-size: 1.4rem;
+  margin-top: 2.4rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--stone-line);
+}
+
+a { color: var(--ochre-hi); }
+a:hover { color: var(--ochre); }
+
+strong { color: var(--pale); }
+
+code {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--stone);
+  color: var(--ink);
+  padding: 0.12em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: #141A23;
+  border: 1px solid var(--stone-mid);
+  border-left: 4px solid var(--ochre-deep);
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+  border-radius: 6px;
+  line-height: 1.55;
+}
+pre code { background: none; padding: 0; font-size: 0.92em; }
+
+blockquote {
+  border-left: 4px solid var(--ochre);
+  margin: 1.4rem 0;
+  padding: 0.3rem 1.25rem;
+  color: var(--mist);
+  font-style: italic;
+}
+
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.35rem 0; }
+
+img { max-width: 100%; }
+
+hr {
+  border: none;
+  border-top: 3px double var(--stone-line);
+  margin: 2.75rem auto;
+  width: 45%;
+}
+
+footer {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2.5rem;
+  border-top: 3px double var(--stone-line);
+  font-size: 0.85rem;
+  color: var(--mist);
+}
+footer a { color: var(--mist); text-decoration-color: var(--ochre-deep); }
+footer a:hover { color: var(--ochre-hi); }

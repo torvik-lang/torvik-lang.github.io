@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tour - Torvik</title>
+  <meta name="description" content="A tour of the Torvik language - variables, functions, pattern matching, weave pipelines, error handling, and concurrency">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tour.html">Tour</a>
+      <a href="vefna.html">Vefna</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Docs</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>A tour of Torvik</h1>
+<p>Everything below is real, compiling Torvik. For the full story, read
+<a href="https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md">the Guide</a>.</p>
+<h2>Variables</h2>
+<p><code>set</code> declares a variable; <code>fixed</code> declares one that cannot be reassigned.</p>
+<pre><code class="language-torvik">set count: i64 = 3;
+fixed name: str = "Odin";
+count += 1;</code></pre>
+<h2>Functions</h2>
+<p>Functions are declared with <code>df</code>. Every parameter and return type is explicit.</p>
+<pre><code class="language-torvik">df square(n: i64) -&gt; i64 {
+    return n * n;
+}</code></pre>
+<h2>Printing and interpolation</h2>
+<p><code>echo!</code> prints with a newline and interpolates <code>{name}</code> directly - variables or full
+expressions. <code>fmt</code> builds a string value the same way, and also takes positional <code>{}</code>
+placeholders.</p>
+<pre><code class="language-torvik">echo!("Hello {name}!");
+echo!("total: {price * qty}");
+fixed line: str = fmt("{} + {} = {}", 2, 3, 5);</code></pre>
+<p>Interpolation belongs to <code>echo</code>, <code>echo!</code>, and <code>fmt</code> alone. A string literal anywhere
+else is plain data - braces are just characters, so CSS, JSON, or template text needs
+no escapes:</p>
+<pre><code class="language-torvik">fixed css: str = ".rune{color:red}";
+fixed slot: str = "Tour";</code></pre>
+<h2>Conditionals and guards</h2>
+<p><code>check</code> is Torvik's if; <code>fallback</code> is its else. <code>guard</code> states what must hold and
+handles the exit path up front.</p>
+<pre><code class="language-torvik">check n &gt; 9 {
+    echo!("big");
+} fallback {
+    echo!("small");
+}
+
+guard len(name) &gt; 0 fallback {
+    echo!("a name is required");
+    return;
+}</code></pre>
+<h2>Aetts and pattern matching</h2>
+<p>An <code>aett</code> - named for the rune families - is an enumeration. <code>when</code> matches over it,
+and the compiler checks every variant is covered.</p>
+<pre><code class="language-torvik">aett Status { Draft, Published, Archived }
+
+df describe(s: Status) -&gt; str {
+    set out: str = "";
+    when s {
+        Status::Draft     =&gt; { out = "still being carved"; }
+        Status::Published =&gt; { out = "raised for all to read"; }
+        Status::Archived  =&gt; { out = "weathered but standing"; }
+    }
+    return out;
+}</code></pre>
+<h2>Loops</h2>
+<p><code>whilst</code> loops on a condition; <code>each</code> walks a range or a list.</p>
+<pre><code class="language-torvik">each i in 0..3 { echo!("run {i}"); }
+
+fixed runes: list&lt;str&gt; = split("fehu,uruz,thurisaz", ",");
+each r in runes { echo!(r); }</code></pre>
+<h2>The weave</h2>
+<p>The weave operator <code>~&gt;</code> threads a value through a pipeline, left to right:</p>
+<pre><code class="language-torvik">fixed slug: str = " Hello, Torvik " ~&gt; trim ~&gt; lower ~&gt; replace(" ", "-");
+// hello,-torvik</code></pre>
+<h2>Errors as values</h2>
+<p>Fallible operations return a <code>result</code> - checked explicitly, no exceptions:</p>
+<pre><code class="language-torvik">set r: result&lt;str&gt; = try_readfile("saga.txt");
+check is_err(r) {
+    fixed why: str = err_msg(r);
+    echo!("could not read: {why}");
+    return;
+}
+fixed text: str = unwrap(r);</code></pre>
+<h2>Concurrency: ravens and bridges</h2>
+<p><code>raven</code> spawns a function on its own OS thread; a <code>bridge</code> is a typed, buffered
+channel between tasks. Arguments deep-copy at the spawn and values deep-copy on send,
+so threads share no mutable state - and the compiler enforces that spawned functions
+touch no globals.</p>
+<pre><code class="language-torvik">df fetch_len(path: str) -&gt; i64 {
+    return len(readfile(path));
+}
+
+df main() -&gt; void {
+    set h: task&lt;i64&gt; = raven fetch_len("saga.txt");
+    // ... other work ...
+    fixed n: i64 = join(h);
+    echo!("{n} bytes");
+}</code></pre>
+<h2>Collections</h2>
+<pre><code class="language-torvik">set xs: list&lt;i64&gt; = list_new();
+push(xs, 7);
+
+set cfg: table&lt;str, str&gt; = table_new();
+table_set(cfg, "title", "My Site");
+fixed keys: list&lt;str&gt; = table_keys(cfg);   // sorted, so loops are reproducible</code></pre>
+<hr>
+<p>Ready to write some? <a href="index.html">Install Torvik</a> and <code>rune new</code> your first project -
+or see how far the language goes in <a href="vefna.html">Vefna</a>, a real tool built with it.</p>
+  </main>
+  <footer>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+  </footer>
+</body>
+</html>

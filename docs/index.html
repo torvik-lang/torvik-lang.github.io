@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home - Torvik</title>
+  <meta name="description" content="Torvik - a self-hosting, compiled, general-purpose programming language">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tour.html">Tour</a>
+      <a href="vefna.html">Vefna</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Docs</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Torvik</h1>
+<p><strong>A self-hosting, compiled, general-purpose programming language.</strong> Norse-inspired
+keywords, native binaries through LLVM, automatic reference counting with no garbage
+collector - and concurrency that is safe by construction.</p>
+<p>The compiler (<code>torvc</code>) and the project tool (<code>rune</code>) are both written in Torvik itself.</p>
+<h2>Install</h2>
+<p>Linux:</p>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
+<p>Windows (PowerShell):</p>
+<pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></pre>
+<p>Then:</p>
+<pre><code>rune new hello
+cd hello
+rune run</code></pre>
+<h2>Why Torvik</h2>
+<ul>
+<li><strong>Native compilation</strong> - Torvik emits LLVM IR linked with <code>clang</code>. Real executables,</li>
+</ul>
+<p>no virtual machine, no interpreter.</p>
+<ul>
+<li><strong>Self-hosting</strong> - the language is proven on its hardest program: its own compiler.</li>
+<li><strong>No GC, no manual frees</strong> - automatic reference counting gives deterministic memory</li>
+</ul>
+<p>management, and it stays <strong>lock-free across threads</strong> by design.</p>
+<ul>
+<li><strong>Concurrency without data races</strong> - spawn tasks with <code>raven</code>, pass values over typed</li>
+</ul>
+<p><code>bridge</code> channels. Values copy as they cross a thread, so tasks share no mutable
+state - a data race is not something you avoid, it is something you cannot write.</p>
+<ul>
+<li><strong>A small, sharp type system</strong> - integer widths <code>i8</code> through <code>u128</code>, <code>f64</code>, <code>bool</code>,</li>
+</ul>
+<p><code>str</code>, the <code>list</code>, <code>table</code>, and <code>bag</code> collections, <code>result</code> for explicit error
+handling, and <code>aett</code> enumerations with exhaustiveness-checked <code>when</code> matching.</p>
+<ul>
+<li><strong>Clean errors</strong> - located, plain-language compile errors, plus a warnings system</li>
+</ul>
+<p>that found dead code in the compiler's own source the first time it ran.</p>
+<h2>A taste</h2>
+<p>A worker reads jobs from a bridge until it closes - the raven carries everything it
+needs in its claws:</p>
+<pre><code class="language-torvik">apply std;
+
+df worker(jobs: bridge&lt;i64&gt;, results: bridge&lt;i64&gt;) -&gt; void {
+    whilst true {
+        set r: result&lt;i64&gt; = try_recv(jobs);
+        check is_err(r) { break; }
+        fixed n: i64 = unwrap(r);
+        send(results, n * n);
+    }
+}
+
+df main() -&gt; void {
+    set jobs: bridge&lt;i64&gt; = bridge_new(8);
+    set results: bridge&lt;i64&gt; = bridge_new(8);
+    set h: task&lt;void&gt; = raven worker(jobs, results);
+
+    set i: i64 = 1;
+    whilst i &lt;= 5 { send(jobs, i); i += 1; }
+    bridge_close(jobs);
+
+    set total: i64 = 0;
+    set got: i64 = 0;
+    whilst got &lt; 5 { total += recv(results); got += 1; }
+    join(h);
+
+    echo!("sum of squares: {total}");
+}</code></pre>
+<p>Take the <a href="tour.html">full tour</a> for more of the language.</p>
+<h2>Built with Torvik</h2>
+<blockquote><p>The Norns sit at the well beneath the world-tree, weaving the threads of fate.</p></blockquote>
+<p><a href="vefna.html">Vefna</a> is a static site generator written entirely in Torvik - it renders
+pages in parallel on eight raven worker threads, and it wove the page you are reading
+right now.</p>
+<h2>Learn more</h2>
+<ul>
+<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md">The Torvik Guide</a> - full tutorial and language reference</li>
+<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/STDLIB.md">Standard library</a> - built-in function reference</li>
+<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md">Tooling</a> - <code>torvc</code> and <code>rune</code></li>
+<li><a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a> - guides and FAQ</li>
+<li><a href="https://github.com/torvik-lang/torvik/releases">Releases</a> - changelogs and binaries</li>
+</ul>
+  </main>
+  <footer>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+  </footer>
+</body>
+</html>

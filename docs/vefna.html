@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vefna - Torvik</title>
+  <meta name="description" content="Vefna - a static site generator woven in Torvik. Markdown in, HTML out, in parallel.">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tour.html">Tour</a>
+      <a href="vefna.html">Vefna</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Docs</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Vefna</h1>
+<p><strong>A static site generator woven in Torvik.</strong> <em>(VEF-nah - coined from the Old Norse</em>
+vefa<em>, "to weave," and</em> vefr<em>, "web.")</em></p>
+<p>Vefna reads a folder of Markdown, presses it through your HTML templates, and writes a
+complete static site - ready for GitHub Pages, Cloudflare Pages, Netlify, or any plain
+web server. No runtime, no database, no dependencies: one compiled binary.</p>
+<p>It is also Torvik's flagship showcase: pages render in parallel on <strong>eight raven worker
+threads</strong> fed by typed bridge channels - 500+ pages weave in well under a second - and
+builds are incremental and fully deterministic. <strong>This site is woven by Vefna.</strong></p>
+<h2>Install</h2>
+<p>Linux:</p>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/vefna/main/linux/install.sh | sh</code></pre>
+<p>Windows (PowerShell):</p>
+<pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/vefna/main/windows/install.ps1 | iex</code></pre>
+<p>Or grab a binary from the <a href="https://github.com/torvik-lang/vefna/releases">releases page</a>
+and put it on your PATH.</p>
+<h2>Quick start</h2>
+<pre><code>vefna new myblog
+cd myblog
+vefna build</code></pre>
+<p>Your site is in <code>site/</code> - open it in a browser or push it to any static host.</p>
+<h2>What you get</h2>
+<ul>
+<li>A pragmatic <strong>Markdown</strong> subset: headings, paragraphs, bold, italic, inline code,</li>
+</ul>
+<p>links, images, lists, blockquotes, fenced code blocks, horizontal rules - all output
+HTML-escaped</p>
+<ul>
+<li><strong>Front matter</strong> (<code>title</code>, <code>description</code>, <code>author</code>, <code>date</code>, <code>template</code>) with</li>
+</ul>
+<p>site-wide fallbacks from one <code>vefna.site</code> config</p>
+<ul>
+<li>Plain <strong>HTML templates</strong> with <code>{{slot}}</code> placeholders and per-page template selection</li>
+<li><strong>Incremental builds</strong> - a page reweaves only when its source, a template, or the</li>
+</ul>
+<p>config is newer than its output</p>
+<ul>
+<li><strong>Deterministic output</strong> - the same inputs produce a byte-identical site on every</li>
+</ul>
+<p>platform, every time</p>
+<ul>
+<li><code>static/</code> assets copied binary-safe, folder structure carried straight through</li>
+</ul>
+<p>Everything else - the full command reference, template slots, and hosting notes - is in
+the <a href="https://github.com/torvik-lang/vefna">README</a>.</p>
+<blockquote><p>The Norns weave the threads of fate. Vefna weaves only web pages, which is safer.</p></blockquote>
+  </main>
+  <footer>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+  </footer>
+</body>
+</html>
