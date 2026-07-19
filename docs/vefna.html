@@ -41,6 +41,9 @@ builds are incremental and fully deterministic. <strong>This site is woven by Ve
 <pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/vefna/main/windows/install.ps1 | iex</code></pre>
 <p>Or grab a binary from the <a href="https://github.com/torvik-lang/vefna/releases">releases page</a>
 and put it on your PATH.</p>
+<p><strong>Updating:</strong> re-run the install line above - it always fetches the latest release.
+Pin a version with <code>VEFNA_VERSION=1.0.0</code> (Linux) or <code>$env:VEFNA_VERSION = "1.0.0"</code>
+(Windows) before running it; uninstall with the script's <code>--uninstall</code> flag.</p>
 <h2>Quick start</h2>
 <pre><code>vefna new myblog
 cd myblog

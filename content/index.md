@@ -13,6 +13,12 @@ The compiler (`torvc`) and the project tool (`rune`) are both written in Torvik 
 
 ## Install
 
+Torvik runs on **Linux** and **Windows** (x86-64); macOS is planned once real Apple
+hardware is available for testing. You'll need `clang` on your PATH - on Linux install
+it from your package manager (`sudo apt install clang`, Solus: `sudo eopkg install
+clang`); on Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and
+points you in the right direction if it's missing).
+
 Linux:
 
 ```
@@ -32,6 +38,19 @@ rune new hello
 cd hello
 rune run
 ```
+
+## Already on Torvik?
+
+`rune` manages the toolchain from there - no need to re-run the installer:
+
+```
+rune update            # update to the latest release
+rune update v1.3       # or pin: a release with 1.3.x 
+rune version           # see what you're running
+```
+
+`rune update` fetches the release, verifies it, and swaps it in place;
+`rune uninstall` removes the toolchain cleanly if you ever want it gone.
 
 ## Why Torvik
 
@@ -101,3 +120,4 @@ right now.
 - [Tooling](https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md) - `torvc` and `rune`
 - [Wiki](https://github.com/torvik-lang/torvik/wiki) - guides and FAQ
 - [Releases](https://github.com/torvik-lang/torvik/releases) - changelogs and binaries
+- [Discussions](https://github.com/torvik-lang/torvik/discussions) - questions, ideas, and show-and-tell

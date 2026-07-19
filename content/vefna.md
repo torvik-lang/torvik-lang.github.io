@@ -33,6 +33,10 @@ iwr -useb https://raw.githubusercontent.com/torvik-lang/vefna/main/windows/insta
 Or grab a binary from the [releases page](https://github.com/torvik-lang/vefna/releases)
 and put it on your PATH.
 
+**Updating:** re-run the install line above - it always fetches the latest release.
+Pin a version with `VEFNA_VERSION=1.0.0` (Linux) or `$env:VEFNA_VERSION = "1.0.0"`
+(Windows) before running it; uninstall with the script's `--uninstall` flag.
+
 ## Quick start
 
 ```
