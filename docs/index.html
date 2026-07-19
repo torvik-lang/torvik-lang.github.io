@@ -31,6 +31,11 @@ keywords, native binaries through LLVM, automatic reference counting with no gar
 collector - and concurrency that is safe by construction.</p>
 <p>The compiler (<code>torvc</code>) and the project tool (<code>rune</code>) are both written in Torvik itself.</p>
 <h2>Install</h2>
+<p>Torvik runs on <strong>Linux</strong> and <strong>Windows</strong> (x86-64); macOS is planned once real Apple
+hardware is available for testing. You'll need <code>clang</code> on your PATH - on Linux install
+it from your package manager (<code>sudo apt install clang</code>, Solus: <code>sudo eopkg install
+clang</code>); on Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and
+points you in the right direction if it's missing).</p>
 <p>Linux:</p>
 <pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
 <p>Windows (PowerShell):</p>
@@ -39,6 +44,13 @@ collector - and concurrency that is safe by construction.</p>
 <pre><code>rune new hello
 cd hello
 rune run</code></pre>
+<h2>Already on Torvik?</h2>
+<p><code>rune</code> manages the toolchain from there - no need to re-run the installer:</p>
+<pre><code>rune update            # update to the latest release
+rune update v1.3       # or pin: a release with 1.3.x
+rune version           # see what you're running</code></pre>
+<p><code>rune update</code> fetches the release, verifies it, and swaps it in place;
+<code>rune uninstall</code> removes the toolchain cleanly if you ever want it gone.</p>
 <h2>Why Torvik</h2>
 <ul>
 <li><strong>Native compilation</strong> - Torvik emits LLVM IR linked with <code>clang</code>. Real executables,</li>
@@ -106,6 +118,7 @@ right now.</p>
 <li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md">Tooling</a> - <code>torvc</code> and <code>rune</code></li>
 <li><a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a> - guides and FAQ</li>
 <li><a href="https://github.com/torvik-lang/torvik/releases">Releases</a> - changelogs and binaries</li>
+<li><a href="https://github.com/torvik-lang/torvik/discussions">Discussions</a> - questions, ideas, and show-and-tell</li>
 </ul>
   </main>
   <footer>
