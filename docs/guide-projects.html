@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 7 - Modules and projects - Torvik</title>
+  <meta name="description" content="Split code across files with apply, use the Torvik standard library including std::net, and build and ship real projects with rune.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 7 - Modules and projects - Torvik">
+  <meta property="og:description" content="Split code across files with apply, use the Torvik standard library including std::net, and build and ship real projects with rune.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 7 - Modules and projects - Torvik">
+  <meta name="twitter:description" content="Split code across files with apply, use the Torvik standard library including std::net, and build and ship real projects with rune.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>7. Modules, the standard library, and real projects</h1>
+<p><em><a href="/guide-concurrency">← 6. Concurrency</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-reference">Appendix: reference →</a></em></p>
+<p>Everything so far has lived in one file compiled by hand. Real projects outgrow both. This
+chapter covers splitting code across files, the library that ships with Torvik, and the
+project tool that ties it together.</p>
+<h2>Modules: <code>apply</code></h2>
+<p><code>apply NAME;</code> brings another Torvik file's definitions into the current one.</p>
+<p>Put shared code in its own file, <code>helpers.tv</code>:</p>
+<pre><code class="language-torvik">df shout(s: str) -&gt; str {
+    return str_concat(upper(s), "!");
+}
+
+df is_blank(s: str) -&gt; bool {
+    return len(trim(s)) == 0;
+}</code></pre>
+<p>And use it from <code>main.tv</code>:</p>
+<pre><code class="language-torvik">apply helpers;
+
+df main() -&gt; void {
+    echo!(shout("hello"));          // HELLO!
+    echo!(is_blank("   "));         // true
+}</code></pre>
+<p><code>apply</code> lines go at the <strong>top</strong> of the file. The applied module's functions are then
+available as if you'd written them there.</p>
+<p>Split along <strong>responsibility</strong>, not size: parsing in one module, formatting in another,
+business logic in a third. If you can't name what a module is <em>for</em>, it probably wants
+splitting differently.</p>
+<h2>The standard library</h2>
+<p>On top of the always-available core builtins (<code>len</code>, <code>str_concat</code>, <code>echo</code>, the collection
+functions — everything used so far), Torvik ships an <strong>opt-in standard library</strong>.</p>
+<pre><code class="language-torvik">apply std;             // everything</code></pre>
+<p>Or take just what you need:</p>
+<pre><code class="language-torvik">apply std::math;
+apply std::strings;
+apply std::list;
+apply std::path;
+apply std::convert;
+apply std::net;</code></pre>
+<p>The library is versioned <strong>independently of the compiler</strong> — it's currently 1.3.0 while the
+compiler is 1.4.0. That's deliberate: a future breaking change can be gated behind a new
+major library version you opt into in your project manifest, rather than being forced on you
+by a compiler upgrade.</p>
+<h3><code>std::math</code></h3>
+<pre><code class="language-torvik">apply std::math;
+
+echo!(pow(2, 10));       // 1024
+echo!(abs(-5));          // 5
+echo!(gcd(48, 36));      // 12
+echo!(min(3, 7));
+echo!(max(3, 7));</code></pre>
+<h3><code>std::strings</code></h3>
+<pre><code class="language-torvik">apply std::strings;
+
+echo!(join(split("a,b,c", ","), "-"));   // a-b-c
+echo!(pad_left("7", 3, "0"));            // 007
+echo!(repeat("ab", 3));                  // ababab</code></pre>
+<p><code>join</code> is the counterpart to <code>split</code> — it's how you rebuild a line after processing its
+fields.</p>
+<h3><code>std::list</code></h3>
+<pre><code class="language-torvik">apply std::list;
+
+set xs: list&lt;i64&gt; = range(1, 6);   // [1, 2, 3, 4, 5]
+echo!(sum(xs));                    // 15</code></pre>
+<h3><code>std::path</code></h3>
+<p>File path handling that works on both Linux and Windows — it accepts <code>/</code> and <code>\</code> on input:</p>
+<pre><code class="language-torvik">apply std::path;
+
+echo!(path_base("dir/file.txt"));   // file.txt
+echo!(path_dir("dir/file.txt"));    // dir
+echo!(path_ext("dir/file.txt"));    // txt
+echo!(path_join("dir", "file.txt"));</code></pre>
+<h3><code>std::convert</code></h3>
+<p>Base conversions and parsing that reports failure as a <code>result</code>:</p>
+<pre><code class="language-torvik">apply std::convert;
+
+echo!(to_hex(255));       // ff
+echo!(to_bin(5));         // 101</code></pre>
+<h3><code>std::net</code> — a small HTTP layer</h3>
+<p>New in Torvik v1.4.0. <code>std::net</code> gives you enough to serve a static site or a small
+localhost API. Its transport primitives are provided by the compiler and runtime and
+<strong>dead-strip out of programs that never call them</strong>, so you pay nothing unless you use it.</p>
+<p>The transport layer: <code>net_listen</code>, <code>net_accept</code>, <code>net_recv</code>, <code>net_send</code>, <code>net_send_file</code>,
+<code>net_close</code>. On top of that, the module adds request parsing and response building:
+<code>http_method</code>, <code>http_path</code>, <code>url_decode</code>, <code>path_is_safe</code>, <code>mime_type</code>, <code>send_text</code>,
+<code>send_file_response</code>, <code>send_status</code>.</p>
+<p>A minimal server:</p>
+<pre><code class="language-torvik">apply std::net;
+
+df main() -&gt; void {
+    fixed lr: result&lt;i64&gt; = net_listen(8000);
+    check is_err(lr) {
+        echo!("could not listen: {err_msg(lr)}");
+        return;
+    }
+    fixed server: i64 = unwrap(lr);
+    echo!("serving on http://127.0.0.1:8000");
+
+    whilst true {
+        fixed client: i64 = net_accept(server);
+        check client &gt;= 0 {
+            fixed req: str = net_recv(client);
+            fixed path: str = http_path(req);
+
+            check path_is_safe(path) {
+                set _n: i64 = send_text(client, 200, "text/plain",
+                                        fmt("you asked for {path}"));
+            } fallback {
+                set _f: i64 = send_status(client, 403, "Forbidden");
+            }
+
+            net_close(client);
+        }
+    }
+}</code></pre>
+<p>Two things worth noting. <code>path_is_safe</code> rejects <code>..</code> traversal — check it before touching the
+filesystem with a client-supplied path. And <code>net_send_file</code> streams a file's bytes
+<strong>verbatim</strong>, so images, fonts, and archives serve intact even though Torvik strings are
+NUL-terminated.</p>
+<p>The model is deliberately simple and synchronous: accept a connection, read the request, send
+one response, close. Sockets bind to <code>127.0.0.1</code> only, so a dev server is never accidentally
+exposed to the network.</p>
+<p>To opt out of the standard library entirely for a project, set <code>std = no_std</code> in its
+manifest.</p>
+<h2>Projects with <code>rune</code></h2>
+<p><code>rune</code> is the project tool. It creates projects, builds and runs them, and keeps your Torvik
+installation current.</p>
+<h3>Creating a project</h3>
+<pre><code>rune new myproject
+cd myproject</code></pre>
+<p>You get:</p>
+<pre><code>myproject/
+  torvik.rune      the manifest
+  src/
+    main.tv        the entry point</code></pre>
+<p>The entry point is <strong>always</strong> <code>src/main.tv</code> — a convention, not something you configure.</p>
+<h3>The manifest</h3>
+<pre><code>[project]
+name        = "myproject"
+version     = "0.1.0"
+description = "What this project does"
+author      = "Your Name"
+torvik      = "1.4.0"
+std         = "1.3.0"
+
+[runes]
+# dependencies (coming with the Rune Library)</code></pre>
+<p><code>torvik</code> and <code>std</code> declare <strong>minimum versions</strong>. If someone tries to build with an older
+toolchain, they get a clean error pointing at <code>rune update</code> rather than a confusing failure
+deep in the compile. Set them to what you actually use.</p>
+<h3>Building and running</h3>
+<pre><code>rune build          # compile to build/&lt;name&gt;
+rune run            # compile and run
+rune build --final  # optimized release build (-O3, stripped)</code></pre>
+<p>Use <code>rune run</code> while developing and <code>rune build --final</code> for anything you ship. The
+difference in output size and speed is significant.</p>
+<p>Other commands:</p>
+<pre><code>rune init           # make the current directory a project
+rune list           # show project info
+rune clean          # remove build/
+rune version        # rune, language, and std versions
+rune update         # update Torvik and rune
+rune self-update    # update just rune
+rune uninstall      # remove the toolchain</code></pre>
+<p><code>rune update</code> pins too: <code>rune update v1.4</code> takes the newest 1.4.x.</p>
+<h3>A project layout that scales</h3>
+<pre><code>myproject/
+  torvik.rune
+  src/
+    main.tv         entry point, argument handling
+    config.tv       loading and validating settings
+    parse.tv        input parsing
+    report.tv       output formatting
+  tests/
+    run_tests.sh</code></pre>
+<p>with <code>main.tv</code> starting:</p>
+<pre><code class="language-torvik">apply std;
+apply config;
+apply parse;
+apply report;
+
+df main() -&gt; void {
+    // ...
+}</code></pre>
+<p>Keep <code>main.tv</code> small — argument handling and orchestration. The real work belongs in modules
+that can be reasoned about, and tested, on their own.</p>
+<h2>Reading command-line arguments</h2>
+<pre><code class="language-torvik">df main() -&gt; void {
+    fixed argc: i64 = args();
+
+    check argc &lt; 2 {
+        echo!("usage: mytool &lt;filename&gt;");
+        return;
+    }
+
+    fixed path: str = args_get(1);
+    echo!("processing {path}");
+}</code></pre>
+<p><code>args()</code> gives the count and <code>args_get(i)</code> the argument at index <code>i</code>. Index 0 is the program
+name, so real arguments start at 1.</p>
+<p>A flag-handling shape that stays readable:</p>
+<pre><code class="language-torvik">df has_flag(flag: str) -&gt; bool {
+    fixed argc: i64 = args();
+    set i: i64 = 1;
+    whilst i &lt; argc {
+        fixed a: str = args_get(i);
+        check a == flag { return true; }
+        i += 1;
+    }
+    return false;
+}
+
+df main() -&gt; void {
+    fixed verbose: bool = has_flag("--verbose");
+    check verbose { echo!("verbose mode"); }
+}</code></pre>
+<h2>Working with files</h2>
+<pre><code class="language-torvik">fixed text: result&lt;str&gt; = try_readfile("input.txt");
+check is_err(text) {
+    echo!("could not read input.txt: {err_msg(text)}");
+    return;
+}
+
+each line in split(unwrap(text), "\n") {
+    check len(trim(line)) &gt; 0 {
+        echo!(line);
+    }
+}</code></pre>
+<p>Other file operations include <code>writefile</code>, <code>appendfile</code>, <code>fs_exists</code>, <code>fs_size</code>, <code>fs_mkdir</code>,
+<code>fs_remove</code>, <code>fs_copy</code>, <code>fs_is_dir</code>, and <code>dir_list</code>. The <code>try_</code> forms (<code>try_readfile</code>,
+<code>try_writefile</code>, <code>try_appendfile</code>, <code>try_fs_copy</code>) return a <code>result</code> instead of halting — use
+those whenever a missing or unreadable file is a realistic outcome, which is nearly always.</p>
+<h2>A complete small tool</h2>
+<pre><code class="language-torvik">apply std;
+
+df count_lines(text: str) -&gt; i64 {
+    set n: i64 = 0;
+    each line in split(text, "\n") {
+        check len(trim(line)) &gt; 0 { n += 1; }
+    }
+    return n;
+}
+
+df main() -&gt; void {
+    fixed argc: i64 = args();
+    check argc &lt; 2 {
+        echo!("usage: linecount &lt;file&gt; [&lt;file&gt;...]");
+        return;
+    }
+
+    set total: i64 = 0;
+    set i: i64 = 1;
+
+    whilst i &lt; argc {
+        fixed path: str = args_get(i);
+        fixed content: result&lt;str&gt; = try_readfile(path);
+
+        check is_err(content) {
+            echo!("skipping {path}: {err_msg(content)}");
+        } fallback {
+            fixed n: i64 = count_lines(unwrap(content));
+            echo!("{path}: {n}");
+            total += n;
+        }
+
+        i += 1;
+    }
+
+    echo!("total: {total}");
+}</code></pre>
+<p>Build it with <code>rune build --final</code> and you have a single binary that runs anywhere on that
+platform with nothing installed.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Split one of your earlier programs into two files and wire them with <code>apply</code>.</li>
+<li>Create a project with <code>rune new</code>, build it, and run it.</li>
+<li>Set <code>torvik = "9.0.0"</code> in the manifest and try to build. Read the error, then fix it.</li>
+<li>Write a tool that takes a filename and prints the longest line.</li>
+<li>Add a <code>--count</code> flag that changes the output.</li>
+<li>Run the <code>std::net</code> server and visit <code>http://127.0.0.1:8000/hello</code> in a browser.</li>
+<li>Compare the size of <code>rune build</code> and <code>rune build --final</code> output.</li>
+</ol>
+<hr>
+<p><em><a href="/guide-concurrency">← 6. Concurrency</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-reference">Appendix: reference →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

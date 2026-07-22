@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contributing - Torvik</title>
+  <meta name="description" content="How to contribute to Torvik, rune, and Vefna - reporting issues, submitting pull requests, and getting set up.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Contributing - Torvik">
+  <meta property="og:description" content="How to contribute to Torvik, rune, and Vefna - reporting issues, submitting pull requests, and getting set up.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Contributing - Torvik">
+  <meta name="twitter:description" content="How to contribute to Torvik, rune, and Vefna - reporting issues, submitting pull requests, and getting set up.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Contributing</h1>
+<p>Torvik, rune, and Vefna are young, open-source (AGPL-3.0) projects, and community help
+is genuinely valued. Each project keeps a <code>CONTRIBUTING.md</code> in its repository — the
+authoritative guide — and this page is the short version with links straight to it.</p>
+<p>All contributors are expected to follow the
+<a href="https://github.com/torvik-lang/torvik/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
+<h2>Ways to help</h2>
+<ul>
+<li><strong>Report a bug</strong> — open an issue with your version (<code>rune version</code> / <code>vefna version</code>),</li>
+</ul>
+<p>a minimal example that reproduces it, expected vs. actual behavior, and your platform.</p>
+<ul>
+<li><strong>Suggest a feature</strong> — describe the problem it solves and why it fits the project's</li>
+</ul>
+<p>goals. For larger features, open an issue to discuss before building.</p>
+<ul>
+<li><strong>Improve the docs</strong> — corrections and clarifications to the guides, the wiki, or this</li>
+</ul>
+<p>site are always welcome.</p>
+<ul>
+<li><strong>Send a pull request</strong> — see the flow below.</li>
+</ul>
+<h2>The general flow</h2>
+<ol>
+<li><strong>Open an issue first</strong> (or comment on an existing one) to discuss the change —</li>
+</ol>
+<p>especially for new features or larger refactors. Small, obvious fixes can go straight
+to a PR.</p>
+<ol>
+<li><strong>Fork</strong> the repository and create a feature branch.</li>
+<li><strong>Make your change</strong> following the project's style and, for Torvik and rune, its</li>
+</ol>
+<p>self-hosting principles.</p>
+<ol>
+<li><strong>Test thoroughly.</strong> Every project ships a test suite; all tests must pass before and</li>
+</ol>
+<p>after your change.</p>
+<ol>
+<li><strong>Update the docs</strong> if behavior changed.</li>
+<li><strong>Open the pull request</strong> with a clear description of what and why. By contributing you</li>
+</ol>
+<p>agree your work is licensed under the project's <strong>AGPL-3.0</strong> license.</p>
+<h2>By project</h2>
+<h3>Torvik</h3>
+<p>The language, compiler (<code>torvc</code>), standard library, and runtime.</p>
+<ul>
+<li>Code lives in <code>src/</code> (compiler), <code>src/std/</code> (standard library), and the runtime.</li>
+<li>Building the compiler uses maintainer tooling that isn't part of the public source. If</li>
+</ul>
+<p>you want to build Torvik directly, email <strong>torviklang@gmail.com</strong> and we'll send you the
+build scripts and, if needed, a <code>torvc</code> binary. For many changes (docs, standard-library
+code, examples) you can work against an installed toolchain without building the compiler
+from scratch.</p>
+<ul>
+<li><a href="https://github.com/torvik-lang/torvik/blob/main/CONTRIBUTING.md">Torvik CONTRIBUTING.md</a></li>
+</ul>
+<p>· <a href="https://github.com/torvik-lang/torvik/issues">Issues</a></p>
+<h3>rune</h3>
+<p>The project and toolchain manager, written in Torvik.</p>
+<ul>
+<li>Code lives in <code>src/rune.tv</code>; <code>src/diag.tv</code> is a vendored copy of Torvik's diagnostics</li>
+</ul>
+<p>module and is kept in sync with the Torvik repo rather than diverged.</p>
+<ul>
+<li>rune stays self-contained — it depends only on <code>torvc</code>, the standard library, and the</li>
+</ul>
+<p>vendored <code>diag</code>. For build tooling, email <strong>torviklang@gmail.com</strong>.</p>
+<ul>
+<li><a href="https://github.com/torvik-lang/rune/blob/main/CONTRIBUTING.md">rune CONTRIBUTING.md</a></li>
+</ul>
+<p>· <a href="https://github.com/torvik-lang/rune/issues">Issues</a></p>
+<h3>Vefna</h3>
+<p>The static site generator, written entirely in Torvik — and buildable with a public
+toolchain.</p>
+<ol>
+<li>Install Torvik (Vefna v1.1.0 builds with <strong>Torvik v1.4.0</strong>):</li>
+</ol>
+<pre><code>   curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
+<ol>
+<li>Build and test:</li>
+</ol>
+<pre><code>   rune build --final
+   bash tests/run_tests.sh build/vefna                              # Linux
+   powershell -ExecutionPolicy Bypass -File tests\run_tests.ps1     # Windows</code></pre>
+<p>All tests must pass before and after your change. Check
+<a href="https://github.com/torvik-lang/vefna/blob/main/ROADMAP.md">ROADMAP.md</a> — including the
+non-goals — before proposing a feature.</p>
+<ul>
+<li><a href="https://github.com/torvik-lang/vefna/blob/main/CONTRIBUTING.md">Vefna CONTRIBUTING.md</a></li>
+</ul>
+<p>· <a href="https://github.com/torvik-lang/vefna/issues">Issues</a></p>
+<h2>Questions</h2>
+<p>Not sure where something fits, or want to talk an idea through first? Reach out on the
+<a href="/contact">contact page</a> — email or social both work.</p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

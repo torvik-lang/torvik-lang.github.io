@@ -5,29 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tour - Torvik</title>
   <meta name="description" content="A tour of the Torvik language - variables, functions, pattern matching, weave pipelines, error handling, and concurrency">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Tour - Torvik">
+  <meta property="og:description" content="A tour of the Torvik language - variables, functions, pattern matching, weave pipelines, error handling, and concurrency">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Tour - Torvik">
+  <meta name="twitter:description" content="A tour of the Torvik language - variables, functions, pattern matching, weave pipelines, error handling, and concurrency">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
   <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
   <header>
-    <a class="brand" href="index.html">
+    <a class="brand" href="/">
       <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
       <span>Torvik</span>
     </a>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="tour.html">Tour</a>
-      <a href="vefna.html">Vefna</a>
-      <a href="https://github.com/torvik-lang/torvik/wiki">Docs</a>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
       <a href="https://github.com/torvik-lang/torvik">GitHub</a>
     </nav>
   </header>
   <main>
 
 <h1>A tour of Torvik</h1>
-<p>Everything below is real, compiling Torvik. For the full story, read
-<a href="https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md">the Guide</a>.</p>
+<p>Everything below is real, compiling Torvik. This is the quick tasting menu — for the full
+story, start with the <a href="/guide">Language Guide</a>, which teaches the whole language from the
+beginning.</p>
 <h2>Variables</h2>
 <p><code>set</code> declares a variable; <code>fixed</code> declares one that cannot be reassigned.</p>
 <pre><code class="language-torvik">set count: i64 = 3;
@@ -38,6 +51,22 @@ count += 1;</code></pre>
 <pre><code class="language-torvik">df square(n: i64) -&gt; i64 {
     return n * n;
 }</code></pre>
+<p>A parameter marked <code>^</code> is <strong>optional</strong> (callers may omit it, and it takes a
+type-appropriate zero); a trailing <code>*</code> parameter is <strong>variadic</strong>, gathering the
+remaining arguments into a <code>list</code>. Every argument is type-checked at the call site.</p>
+<pre><code class="language-torvik">df greet(name: str, ^greeting: str) -&gt; void {
+    check greeting == "" { greeting = "Hail"; }
+    echo!("{greeting}, {name}!");
+}
+
+df loudest(*words: str) -&gt; str {
+    set best: str = "";
+    each w in words { check len(w) &gt; len(best) { best = w; } }
+    return best;
+}
+
+greet("Astrid");            // Hail, Astrid!
+greet("Bjorn", "Well met"); // Well met, Bjorn!</code></pre>
 <h2>Printing and interpolation</h2>
 <p><code>echo!</code> prints with a newline and interpolates <code>{name}</code> directly - variables or full
 expressions. <code>fmt</code> builds a string value the same way, and also takes positional <code>{}</code>
@@ -119,11 +148,23 @@ set cfg: table&lt;str, str&gt; = table_new();
 table_set(cfg, "title", "My Site");
 fixed keys: list&lt;str&gt; = table_keys(cfg);   // sorted, so loops are reproducible</code></pre>
 <hr>
-<p>Ready to write some? <a href="index.html">Install Torvik</a> and <code>rune new</code> your first project -
-or see how far the language goes in <a href="vefna.html">Vefna</a>, a real tool built with it.</p>
+<p>Ready to learn it properly? Start the <a href="/guide">Language Guide</a> — it goes from no programming
+experience at all through to concurrency and shipping real projects.</p>
+<p>Or <a href="/">install Torvik</a> and <code>rune new</code> your first project, and see how far the language goes
+in <a href="/vefna">Vefna</a>, a real tool built with it.</p>
   </main>
   <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
     <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
   </footer>
 </body>
 </html>

@@ -5,21 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Home - Torvik</title>
   <meta name="description" content="Torvik - a self-hosting, compiled, general-purpose programming language">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Home - Torvik">
+  <meta property="og:description" content="Torvik - a self-hosting, compiled, general-purpose programming language">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Home - Torvik">
+  <meta name="twitter:description" content="Torvik - a self-hosting, compiled, general-purpose programming language">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
   <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
   <header>
-    <a class="brand" href="index.html">
+    <a class="brand" href="/">
       <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
       <span>Torvik</span>
     </a>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="tour.html">Tour</a>
-      <a href="vefna.html">Vefna</a>
-      <a href="https://github.com/torvik-lang/torvik/wiki">Docs</a>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
       <a href="https://github.com/torvik-lang/torvik">GitHub</a>
     </nav>
   </header>
@@ -47,10 +59,11 @@ rune run</code></pre>
 <h2>Already on Torvik?</h2>
 <p><code>rune</code> manages the toolchain from there - no need to re-run the installer:</p>
 <pre><code>rune update            # update to the latest release
-rune update v1.3       # or pin: a release with 1.3.x
+rune update v1.4       # or pin: the newest 1.4.x release
 rune version           # see what you're running</code></pre>
 <p><code>rune update</code> fetches the release, verifies it, and swaps it in place;
-<code>rune uninstall</code> removes the toolchain cleanly if you ever want it gone.</p>
+<code>rune uninstall</code> removes the toolchain cleanly if you ever want it gone. See the
+<a href="/rune">rune page</a> for the full command set.</p>
 <h2>Why Torvik</h2>
 <ul>
 <li><strong>Native compilation</strong> - Torvik emits LLVM IR linked with <code>clang</code>. Real executables,</li>
@@ -66,6 +79,14 @@ rune version           # see what you're running</code></pre>
 </ul>
 <p><code>bridge</code> channels. Values copy as they cross a thread, so tasks share no mutable
 state - a data race is not something you avoid, it is something you cannot write.</p>
+<ul>
+<li><strong>Flexible, checked function calls</strong> - optional (<code>^</code>) and variadic (<code>*</code>) parameters, with</li>
+</ul>
+<p>every argument type-checked at the call site so a mismatch is a clean error, not a crash.</p>
+<ul>
+<li><strong>Networking, opt-in</strong> - <code>apply std::net;</code> adds a small HTTP layer with binary-safe file</li>
+</ul>
+<p>serving; the transport primitives dead-strip out of programs that never use them.</p>
 <ul>
 <li><strong>A small, sharp type system</strong> - integer widths <code>i8</code> through <code>u128</code>, <code>f64</code>, <code>bool</code>,</li>
 </ul>
@@ -105,24 +126,37 @@ df main() -&gt; void {
 
     echo!("sum of squares: {total}");
 }</code></pre>
-<p>Take the <a href="tour.html">full tour</a> for more of the language.</p>
+<p>Take the <a href="/tour">full tour</a> for a quick look at more of the language, or start the
+<a href="/guide">Language Guide</a> to learn Torvik properly from the beginning.</p>
 <h2>Built with Torvik</h2>
 <blockquote><p>The Norns sit at the well beneath the world-tree, weaving the threads of fate.</p></blockquote>
-<p><a href="vefna.html">Vefna</a> is a static site generator written entirely in Torvik - it renders
+<p><a href="/vefna">Vefna</a> is a static site generator written entirely in Torvik - it renders
 pages in parallel on eight raven worker threads, and it wove the page you are reading
 right now.</p>
 <h2>Learn more</h2>
 <ul>
-<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md">The Torvik Guide</a> - full tutorial and language reference</li>
-<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/STDLIB.md">Standard library</a> - built-in function reference</li>
-<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md">Tooling</a> - <code>torvc</code> and <code>rune</code></li>
+<li><a href="/guide">Language Guide</a> - the complete tutorial, from no programming experience to concurrent programs</li>
+<li><a href="/guide-reference">Reference</a> - every keyword, operator, and built-in function in one place</li>
+<li><a href="/tour">Tour</a> - a quick tasting menu of the language</li>
+<li><a href="/rune">rune</a> - the project and toolchain manager (install, update, uninstall)</li>
+<li><a href="/vefna">Vefna</a> - the static site generator woven in Torvik</li>
 <li><a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a> - guides and FAQ</li>
 <li><a href="https://github.com/torvik-lang/torvik/releases">Releases</a> - changelogs and binaries</li>
 <li><a href="https://github.com/torvik-lang/torvik/discussions">Discussions</a> - questions, ideas, and show-and-tell</li>
 </ul>
   </main>
   <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
     <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
   </footer>
 </body>
 </html>

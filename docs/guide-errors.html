@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 5 - Errors and safety - Torvik</title>
+  <meta name="description" content="Handle failure explicitly with result, ok, and err; assert invariants with vow and halt; read compile warnings; and use the narrow unsafe prefix.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 5 - Errors and safety - Torvik">
+  <meta property="og:description" content="Handle failure explicitly with result, ok, and err; assert invariants with vow and halt; read compile warnings; and use the narrow unsafe prefix.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 5 - Errors and safety - Torvik">
+  <meta name="twitter:description" content="Handle failure explicitly with result, ok, and err; assert invariants with vow and halt; read compile warnings; and use the narrow unsafe prefix.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>5. Errors, safety, and the compiler on your side</h1>
+<p><em><a href="/guide-collections">← 4. Collections and text</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-concurrency">6. Concurrency →</a></em></p>
+<p>Things fail. Files are missing, input is malformed, a number won't parse. How a language
+handles failure shapes how trustworthy programs written in it are.</p>
+<p>Torvik has no exceptions. Nothing is thrown past you invisibly. A function that can fail says
+so <strong>in its return type</strong>, and you deal with it at the call site.</p>
+<h2><code>result&lt;T&gt;</code></h2>
+<p>A <code>result&lt;T&gt;</code> is either an <strong>ok</strong> carrying a value of type <code>T</code>, or an <strong>err</strong> carrying a
+message (and optionally a numeric code).</p>
+<pre><code class="language-torvik">df safe_div(a: i64, b: i64) -&gt; result&lt;i64&gt; {
+    check b == 0 { return err("division by zero"); }
+    return ok(a / b);
+}</code></pre>
+<p>The signature is the documentation: <code>-&gt; result&lt;i64&gt;</code> says "an integer, or an explanation of
+why not." A caller can't accidentally ignore that.</p>
+<h3>Consuming a result</h3>
+<pre><code class="language-torvik">df main() -&gt; void {
+    set r: result&lt;i64&gt; = safe_div(10, 2);
+
+    check is_ok(r) {
+        echo!("answer: {unwrap(r)}");
+    } fallback {
+        echo!("failed: {err_msg(r)}");
+    }
+}</code></pre>
+<p>The full set:</p>
+<p>| Function | Purpose |
+|---|---|
+| <code>is_ok(r)</code> / <code>is_err(r)</code> | Test which state it's in |
+| <code>unwrap(r)</code> | Take the value — <strong>halts</strong> if it's an err |
+| <code>unwrap_or(r, default)</code> | Take the value, or a fallback if it's an err |
+| <code>err_msg(r)</code> | The error message |
+| <code>err_code(r)</code> | The numeric error code, if one was set |</p>
+<p><code>unwrap</code> halts the program when the result is an err, so only use it after checking, or when
+an err genuinely means the program cannot continue. When you have a sensible default,
+<code>unwrap_or</code> says so in one line:</p>
+<pre><code class="language-torvik">fixed port: i64 = unwrap_or(try_toint(text), 8080);</code></pre>
+<p>You can attach a code alongside the message with <code>err(code, message)</code>, which is useful when a
+caller needs to branch on the kind of failure rather than its wording.</p>
+<p><code>result&lt;i64&gt;</code>, <code>result&lt;str&gt;</code>, and <code>result&lt;f64&gt;</code> are supported as parameters, return types,
+and locals.</p>
+<h3>Builtins that return results</h3>
+<p>Several operations come in a result-returning form — the same work, but failure is a value
+you inspect instead of a halt:</p>
+<pre><code class="language-torvik">fixed content: result&lt;str&gt; = try_readfile("config.txt");
+fixed n: result&lt;i64&gt; = try_toint(user_input);
+fixed f: result&lt;f64&gt; = try_tofloat(user_input);</code></pre>
+<p>Use these whenever failure is <em>expected</em>: user input, files that may not exist, network
+data. Use the plain versions (<code>toint</code>, <code>readfile</code>) only when failure means your assumptions
+are already broken.</p>
+<pre><code class="language-torvik">df read_port(text: str) -&gt; i64 {
+    fixed parsed: result&lt;i64&gt; = try_toint(text);
+
+    check is_err(parsed) {
+        echo!("'{text}' is not a number, using 8080");
+        return 8080;
+    }
+
+    fixed port: i64 = unwrap(parsed);
+
+    check port &lt; 1 {
+        echo!("port must be positive, using 8080");
+        return 8080;
+    }
+    check port &gt; 65535 {
+        echo!("port too large, using 8080");
+        return 8080;
+    }
+
+    return port;
+}</code></pre>
+<h3>Passing failure upward</h3>
+<p>A function that can't handle a failure itself returns it to whoever can:</p>
+<pre><code class="language-torvik">df load_config(path: str) -&gt; result&lt;str&gt; {
+    fixed raw: result&lt;str&gt; = try_readfile(path);
+    check is_err(raw) {
+        return err(fmt("could not read {path}: {err_msg(raw)}"));
+    }
+
+    fixed text: str = unwrap(raw);
+    check len(trim(text)) == 0 {
+        return err(fmt("{path} is empty"));
+    }
+
+    return ok(text);
+}</code></pre>
+<p>Each layer adds context. By the time it reaches <code>main</code>, the message says what was being
+attempted, not just what went wrong at the bottom.</p>
+<h2><code>vow</code> and <code>halt</code></h2>
+<p><code>result</code> is for failures you <strong>expect</strong>. Some conditions instead mean your program's
+assumptions are broken — continuing would produce nonsense.</p>
+<p><code>halt(message)</code> prints and exits immediately with a non-zero status:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    halt("unrecoverable: configuration missing");
+    // nothing after this runs
+}</code></pre>
+<p><code>vow(condition, message)</code> asserts an invariant: if the condition is false it prints and
+exits; if true, execution continues.</p>
+<pre><code class="language-torvik">set balance: i64 = compute_balance();
+vow(balance &gt;= 0, "balance must never be negative");
+echo!("invariant held");</code></pre>
+<p>Use <code>vow</code> to state things that should be <strong>impossible</strong>, not things that might reasonably
+happen. Bad user input is a <code>result</code>. A negative balance after a series of checked
+transactions is a <code>vow</code> — if it fails, there's a bug, and stopping immediately with a clear
+message beats silently corrupting data.</p>
+<p>A useful rule of thumb:</p>
+<p>| Situation | Tool |
+|---|---|
+| Might reasonably happen (bad input, missing file) | <code>result&lt;T&gt;</code> |
+| Should be impossible if the code is correct | <code>vow</code> |
+| Cannot continue, no assertion needed | <code>halt</code> |</p>
+<h2>Compile warnings</h2>
+<p>Warnings flag code that is legal but probably not what you meant. They never fail the
+build — the binary is produced either way — and each comes with the same line-and-caret
+display as an error.</p>
+<p><strong>Unused variable</strong> — a binding that's never read:</p>
+<pre><code class="language-torvik">fixed total: i64 = compute();      // warning if never used
+fixed _total: i64 = compute();     // underscore prefix: deliberate, no warning</code></pre>
+<p>Usually this means a typo or leftover code. Occasionally you want the call's side effect and
+not its value — the underscore says so.</p>
+<p><strong>Unreachable code</strong> — a statement after <code>return</code>, <code>break</code>, <code>continue</code>, <code>halt</code>, or <code>exit</code> in
+the same block. Almost always a misplaced <code>return</code>.</p>
+<p><strong>Unused result</strong> — a bare statement call of a non-void function:</p>
+<pre><code class="language-torvik">init(1);                       // warning: the i64 result is unused
+fixed r: i64 = init(1);        // bind it
+fixed _r: i64 = init(1);       // or say the discard is deliberate</code></pre>
+<p>This one catches a genuinely sneaky bug: calling something that <em>returns</em> a status and
+ignoring it.</p>
+<p><strong>Deprecations</strong> — builtins scheduled for removal warn at every call site with the
+replacement to use.</p>
+<p>Warnings are shown even in quiet builds (<code>-q</code>), because a diagnostic you don't see is
+useless. <code>torvc --no-warn</code> turns them off.</p>
+<h3>Controlling warnings in a file</h3>
+<p>At the top of a file:</p>
+<pre><code class="language-torvik">!@NO_WARN;                    // suppress all warnings for this compilation
+!@ALLOW[unused_variable];     // suppress one category (stackable, one per line)</code></pre>
+<p>Categories: <code>unused_variable</code>, <code>unreachable_code</code>, <code>deprecated</code>, <code>unused_result</code>. A typo or
+unknown category is a <strong>clean compile error</strong>, not a silent no-op — a directive that
+quietly did nothing would be exactly the bug class Torvik exists to eliminate.</p>
+<p>Treat warnings as errors you haven't fixed yet. A codebase with warnings scrolling past is a
+codebase where the real one gets missed.</p>
+<h2>The <code>unsafe</code> prefix</h2>
+<p><code>unsafe</code> in Torvik is <strong>not</strong> a general "anything goes" region. It's a single-statement
+prefix that opts into one specific operation the compiler would otherwise reject.</p>
+<p>Today that operation is <strong>wrapping an out-of-range integer literal into a sized type</strong>:</p>
+<pre><code class="language-torvik">set b: i8 = 200;          // error: 200 is out of range for i8 (valid -128 to 127)
+unsafe set b: i8 = 200;   // allowed - you take responsibility; b wraps to -56
+unsafe x = 300;           // also works on an assignment</code></pre>
+<p>By default the compiler refuses, because silently truncating changes the value and hides
+bugs. When wrapping is genuinely what you want — packing bytes, matching a wire format — you
+say so explicitly, and the <code>unsafe</code> keyword marks it for every future reader.</p>
+<p>It prefixes exactly one declaration or assignment. Using it anywhere else is a clean compile
+error rather than a no-op:</p>
+<pre><code class="language-torvik">unsafe echo!("hi");   // error: unsafe can only prefix a declaration or assignment</code></pre>
+<p>Future releases may extend <code>unsafe</code> to other rejected-by-default operations. Each will be an
+explicit, documented opt-in like this one — never a blanket escape hatch.</p>
+<h2>Putting it together</h2>
+<pre><code class="language-torvik">df parse_setting(line: str) -&gt; result&lt;str&gt; {
+    fixed clean: str = trim(line);
+
+    check len(clean) == 0 { return err("empty line"); }
+    check starts(clean, "#") { return err("comment line"); }
+
+    fixed eq: i64 = find(clean, "=");
+    check eq &lt; 0 { return err(fmt("no '=' in: {clean}")); }
+
+    fixed key: str = trim(substr(clean, 0, eq));
+    check len(key) == 0 { return err(fmt("empty key in: {clean}")); }
+
+    return ok(key);
+}
+
+df main() -&gt; void {
+    set lines: list&lt;str&gt; = list_new();
+    push(lines, "port = 8080");
+    push(lines, "# a comment");
+    push(lines, "");
+    push(lines, "broken line");
+
+    set good: i64 = 0;
+    set bad: i64 = 0;
+
+    each line in lines {
+        fixed r: result&lt;str&gt; = parse_setting(line);
+
+        check is_ok(r) {
+            good += 1;
+            echo!("key: {unwrap(r)}");
+        } fallback {
+            bad += 1;
+            echo!("skipped ({err_msg(r)})");
+        }
+    }
+
+    vow(good + bad == len(lines), "every line must be accounted for");
+    echo!("");
+    echo!("{good} parsed, {bad} skipped");
+}</code></pre>
+<p>Every failure is visible, named, and handled — and the <code>vow</code> states an invariant that should
+never be false.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Write <code>safe_sqrt(x: f64) -&gt; result&lt;f64&gt;</code> returning an err for negative input.</li>
+<li>Use <code>try_toint</code> to parse a list of strings, counting successes and failures.</li>
+<li>Write a function returning <code>err(code, message)</code>, and have the caller branch on</li>
+</ol>
+<p><code>err_code</code>.</p>
+<ol>
+<li>Deliberately trigger each warning — unused variable, unreachable code, unused result —</li>
+</ol>
+<p>and read what the compiler says.</p>
+<ol>
+<li>Add <code>!@ALLOW[unused_variable];</code> to that file and watch one disappear. Then typo the</li>
+</ol>
+<p>category and read the error.</p>
+<ol>
+<li>Try <code>set b: i8 = 200;</code>, read the error, then add <code>unsafe</code> and print the result. Work out</li>
+</ol>
+<p><em>why</em> it becomes -56.</p>
+<ol>
+<li>Take a function using <code>unwrap</code> directly and rewrite it with <code>unwrap_or</code>.</li>
+</ol>
+<hr>
+<p><em><a href="/guide-collections">← 4. Collections and text</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-concurrency">6. Concurrency →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

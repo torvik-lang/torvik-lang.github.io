@@ -34,7 +34,7 @@ Or grab a binary from the [releases page](https://github.com/torvik-lang/vefna/r
 and put it on your PATH.
 
 **Updating:** re-run the install line above - it always fetches the latest release.
-Pin a version with `VEFNA_VERSION=1.0.0` (Linux) or `$env:VEFNA_VERSION = "1.0.0"`
+Pin a version with `VEFNA_VERSION=1.1.0` (Linux) or `$env:VEFNA_VERSION = "1.1.0"`
 (Windows) before running it; uninstall with the script's `--uninstall` flag.
 
 ## Quick start
@@ -42,10 +42,12 @@ Pin a version with `VEFNA_VERSION=1.0.0` (Linux) or `$env:VEFNA_VERSION = "1.0.0
 ```
 vefna new myblog
 cd myblog
-vefna build
+vefna serve
 ```
 
-Your site is in `site/` - open it in a browser or push it to any static host.
+`vefna serve` builds the site and hosts it at `http://127.0.0.1:8000`, rebuilding as
+you write; `vefna build` writes the finished site to `site/` for you to push to any
+static host.
 
 ## What you get
 
@@ -60,6 +62,9 @@ Your site is in `site/` - open it in a browser or push it to any static host.
 - **Deterministic output** - the same inputs produce a byte-identical site on every
   platform, every time
 - `static/` assets copied binary-safe, folder structure carried straight through
+- A built-in **preview server** (`vefna serve`) and **watch mode** (`vefna watch`) that
+  rebuild as you edit, plus **draft pages** (`draft: true` front matter, shown only with
+  `--drafts`)
 
 Everything else - the full command reference, template slots, and hosting notes - is in
 the [README](https://github.com/torvik-lang/vefna).

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 3 - Functions - Torvik</title>
+  <meta name="description" content="Define operations with df, pass parameters and return values, use optional and variadic parameters, write recursive functions, and pipe values with the weave operator.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 3 - Functions - Torvik">
+  <meta property="og:description" content="Define operations with df, pass parameters and return values, use optional and variadic parameters, write recursive functions, and pipe values with the weave operator.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 3 - Functions - Torvik">
+  <meta name="twitter:description" content="Define operations with df, pass parameters and return values, use optional and variadic parameters, write recursive functions, and pipe values with the weave operator.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>3. Functions</h1>
+<p><em><a href="/guide-flow">← 2. Decisions and loops</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-collections">4. Collections and text →</a></em></p>
+<p>A <strong>function</strong> is a named piece of work. You've been writing one since your first program —
+<code>main</code> — and calling others like <code>echo!</code> and <code>len</code>. Now you'll write your own.</p>
+<p>Functions are how programs stay manageable. They let you name an idea once, use it
+everywhere, and change it in one place.</p>
+<h2>Defining a function</h2>
+<pre><code class="language-torvik">df square(n: i64) -&gt; i64 {
+    return n * n;
+}
+
+df main() -&gt; void {
+    echo!(square(5));     // 25
+    echo!(square(12));    // 144
+}</code></pre>
+<p>The shape is:</p>
+<pre><code>df NAME(PARAMETERS) -&gt; RETURN_TYPE { BODY }</code></pre>
+<ul>
+<li><strong><code>df</code></strong> starts the definition.</li>
+<li><strong><code>square</code></strong> is the name — pick a verb or a noun that says what it does.</li>
+<li><strong><code>(n: i64)</code></strong> is the <strong>parameter list</strong>: named inputs, each with a type.</li>
+<li><strong><code>-&gt; i64</code></strong> is the <strong>return type</strong>: the kind of value it hands back.</li>
+<li><strong><code>return</code></strong> sends a value back and ends the function immediately.</li>
+</ul>
+<p>A function that returns nothing uses <code>-&gt; void</code> and simply has no <code>return</code> value:</p>
+<pre><code class="language-torvik">df greet(name: str) -&gt; void {
+    echo!("Hail, {name}!");
+}</code></pre>
+<p>Multiple parameters are separated by commas:</p>
+<pre><code class="language-torvik">df add(a: i64, b: i64) -&gt; i64 {
+    return a + b;
+}
+
+df describe(name: str, age: i64, active: bool) -&gt; str {
+    return fmt("{name} ({age}) active={active}");
+}</code></pre>
+<h2>Calling functions</h2>
+<p>Write the name and pass values in parentheses:</p>
+<pre><code class="language-torvik">fixed total: i64 = add(3, 4);
+greet("Freya");
+echo!(add(square(3), 1));      // calls nest freely: 10</code></pre>
+<p>Arguments are matched <strong>by position</strong>: the first value goes to the first parameter. Torvik
+checks both the count and the types at compile time, so passing a string where a number is
+expected — or three arguments to a two-parameter function — is a clean error, never a
+run-time surprise.</p>
+<p>Functions may call functions defined <strong>later</strong> in the file, and they may call themselves.
+Order doesn't matter:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    echo!(double(21));       // fine - double is defined below
+}
+
+df double(n: i64) -&gt; i64 {
+    return n * 2;
+}</code></pre>
+<h2>Why functions matter</h2>
+<p>Consider code that computes a total three times in three places. When the shipping rule
+changes, you have three edits to find and one to forget. With a function there's one place:</p>
+<pre><code class="language-torvik">df order_total(price: i64, qty: i64) -&gt; i64 {
+    set total: i64 = price * qty;
+    check total &lt; 500 { total += 50; }   // shipping
+    return total;
+}</code></pre>
+<p>A good function does <strong>one thing</strong> and its name says what. If you find yourself writing "and"
+in the name — <code>validate_and_save</code> — that's usually two functions.</p>
+<h2>Returning early</h2>
+<p><code>return</code> exits immediately. Combined with <code>check</code> or <code>guard</code>, this keeps functions flat:</p>
+<pre><code class="language-torvik">df classify(n: i64) -&gt; str {
+    check n &lt; 0  { return "negative"; }
+    check n == 0 { return "zero"; }
+    return "positive";
+}</code></pre>
+<p>Every path must return a value (unless the function is <code>-&gt; void</code>). The compiler enforces
+this — a path that falls off the end without returning is a compile error, not a garbage
+value.</p>
+<h2>Optional parameters: <code>^</code></h2>
+<p>Sometimes a parameter has a sensible default. Mark it with <code>^</code> and callers may leave it off:</p>
+<pre><code class="language-torvik">df greet(name: str, ^greeting: str) -&gt; void {
+    set g: str = greeting;
+    check g == "" { g = "Hail"; }
+    echo!("{g}, {name}!");
+}
+
+df main() -&gt; void {
+    greet("Astrid");               // Hail, Astrid!
+    greet("Bjorn", "Well met");    // Well met, Bjorn!
+}</code></pre>
+<p>An omitted optional gets a <strong>type-appropriate zero</strong>: <code>0</code> for integers, <code>0.0</code> for <code>f64</code>,
+<code>false</code> for <code>bool</code>, and <code>""</code> for <code>str</code>. Check for that value to apply your own default, as
+above.</p>
+<p>Two rules:</p>
+<ul>
+<li><strong>Required parameters come first.</strong> Optionals must be at the end, so a positional call is</li>
+</ul>
+<p>never ambiguous. Putting a required parameter after an optional one is a compile error.</p>
+<ul>
+<li>Optionals are scalar or <code>str</code> types.</li>
+</ul>
+<p>Passing too few or too many arguments gives you a clean range error:</p>
+<pre><code>error: function 'greet' expects 1 to 2 argument(s) but got 3.</code></pre>
+<h2>Variadic parameters: <code>*</code></h2>
+<p>When a function should accept <em>any number</em> of trailing values, mark the <strong>last</strong> parameter
+with <code>*</code>. Those arguments arrive as a list you can iterate:</p>
+<pre><code class="language-torvik">df join_words(sep: str, *words: str) -&gt; str {
+    set out: str = "";
+    set first: bool = true;
+
+    each w in words {
+        check first {
+            out = w;
+            first = false;
+        } fallback {
+            out = str_concat(out, sep, w);
+        }
+    }
+    return out;
+}
+
+df main() -&gt; void {
+    echo!(join_words(", "));                       // (empty)
+    echo!(join_words(", ", "one"));                // one
+    echo!(join_words(", ", "one", "two", "three"));// one, two, three
+}</code></pre>
+<p>A variadic parameter must be <strong>last</strong>, and there can be only one. Its element type is <code>str</code>
+or an integer type.</p>
+<p>All three kinds combine, in this order — required, then optional, then variadic:</p>
+<pre><code class="language-torvik">df log_line(level: str, ^tag: str, *parts: str) -&gt; void {
+    set msg: str = str_concat("[", level, "]");
+    check tag != "" { msg = str_concat(msg, "(", tag, ")"); }
+    each p in parts { msg = str_concat(msg, " ", p); }
+    echo!(msg);
+}
+
+log_line("INFO");                                 // [INFO]
+log_line("WARN", "net");                          // [WARN](net)
+log_line("ERR", "disk", "read", "failed");        // [ERR](disk) read failed</code></pre>
+<h2>Arguments are type-checked</h2>
+<p>Every argument is checked against its parameter at the call site. A definite mismatch — a
+number where a string is expected, a decimal where an integer is expected, a list where a
+scalar is expected — is a clean, located compile error:</p>
+<pre><code>error: argument 1 of 'greet' has the wrong type - this parameter expects str, but got a number.</code></pre>
+<p>This matters more than it sounds. In a language without that check, passing the wrong type
+produces a garbage value that flows onward and fails somewhere else entirely, hours later.
+Here it fails at the line where you made the mistake.</p>
+<h2>Scope</h2>
+<p>A variable declared inside a function exists only inside that function. Blocks nest inward:
+an inner block can see outer variables, but not the reverse.</p>
+<pre><code class="language-torvik">df demo() -&gt; void {
+    fixed outer: i64 = 1;
+
+    check true {
+        fixed inner: i64 = 2;
+        echo!(outer);         // fine - outer is visible here
+    }
+
+    // echo!(inner);          // error: inner no longer exists
+}</code></pre>
+<p>Parameters are variables scoped to their function. Two functions can each have a parameter
+called <code>n</code> with no relationship between them — a function's inputs and locals are private to
+it. That isolation is exactly what makes functions safe to reuse.</p>
+<p>Variables declared at the <strong>top level</strong>, outside any function, are <strong>globals</strong>, visible
+everywhere. Use them sparingly: a value anything can change is a value you can't reason
+about. (They also can't be touched by concurrent tasks — see
+<a href="/guide-concurrency">Chapter 6</a>.)</p>
+<h2>Recursion</h2>
+<p>A function may call <strong>itself</strong>. This is the natural way to express problems that contain
+smaller copies of themselves.</p>
+<pre><code class="language-torvik">df factorial(n: i64) -&gt; i64 {
+    check n &lt;= 1 { return 1; }         // base case
+    return n * factorial(n - 1);       // recursive case
+}
+
+echo!(factorial(5));   // 120</code></pre>
+<p>Every recursive function needs two parts:</p>
+<ol>
+<li>A <strong>base case</strong> that returns without recursing. This is what stops it.</li>
+<li>A <strong>recursive case</strong> that moves <em>toward</em> the base case.</li>
+</ol>
+<p>Get the base case wrong and the function calls itself forever until the program runs out of
+stack space and crashes. When a recursive function misbehaves, check the base case first.</p>
+<p>Tracing <code>factorial(4)</code> by hand:</p>
+<pre><code>factorial(4) = 4 * factorial(3)
+             = 4 * (3 * factorial(2))
+             = 4 * (3 * (2 * factorial(1)))
+             = 4 * (3 * (2 * 1))
+             = 24</code></pre>
+<p>Recursion shines on naturally nested structures — directory trees, nested data, divide-and-
+conquer algorithms. For plain counting, a loop is simpler and faster. Use whichever states
+the problem more honestly.</p>
+<h2>The weave operator: <code>~&gt;</code></h2>
+<p>When you apply several transformations in sequence, nested calls read inside-out:</p>
+<pre><code class="language-torvik">echo!(upper(replace(trim(raw), ",", "-")));    // read from the middle outward</code></pre>
+<p>The <strong>weave</strong> operator pipes a value left to right instead. <code>x ~&gt; f</code> is <code>f(x)</code>:</p>
+<pre><code class="language-torvik">fixed slug: str = raw ~&gt; trim ~&gt; replace(",", "-") ~&gt; upper;</code></pre>
+<p>Same result, read in the order it happens: take <code>raw</code>, trim it, replace commas, uppercase it.</p>
+<p>A stage with arguments inserts the woven value as the <strong>first</strong> argument, so
+<code>x ~&gt; f(a, b)</code> means <code>f(x, a, b)</code>:</p>
+<pre><code class="language-torvik">df addn(x: i64, n: i64) -&gt; i64 { return x + n; }
+
+set v: i64 = 5;
+echo!(v ~&gt; addn(3) ~&gt; addn(10));    // 18</code></pre>
+<p>One-argument builtins like <code>trim</code> and <code>upper</code> are written bare, with no parentheses. Weave
+results are typed and checked: weaving an <code>i64</code> into a function whose first parameter is
+<code>str</code> is a compile error, and argument counts are verified including the inserted value.</p>
+<h2>Putting it together</h2>
+<pre><code class="language-torvik">df is_even(n: i64) -&gt; bool {
+    return n % 2 == 0;
+}
+
+df sum_range(from: i64, to: i64, ^evens_only: bool) -&gt; i64 {
+    set total: i64 = 0;
+    each n in from..+to {
+        check evens_only {
+            check is_even(n) { total += n; }
+        } fallback {
+            total += n;
+        }
+    }
+    return total;
+}
+
+df report(label: str, *values: i64) -&gt; void {
+    set total: i64 = 0;
+    set count: i64 = 0;
+    each v in values {
+        total += v;
+        count += 1;
+    }
+    check count == 0 {
+        echo!("{label}: no values");
+        return;
+    }
+    echo!("{label}: {count} values, total {total}, mean {total / count}");
+}
+
+df main() -&gt; void {
+    echo!(sum_range(1, 10));            // 55
+    echo!(sum_range(1, 10, true));      // 30 - evens only
+
+    report("empty");
+    report("scores", 90, 75, 88);
+}</code></pre>
+<h2>Things to try</h2>
+<ol>
+<li>Write <code>min(a, b)</code> and <code>max(a, b)</code>, then use them together.</li>
+<li>Write <code>celsius_to_f(c: f64) -&gt; f64</code> and print a small conversion table with <code>each</code>.</li>
+<li>Give a <code>greet</code> function an optional <code>^title</code> parameter that prefixes the name when</li>
+</ol>
+<p>supplied.</p>
+<ol>
+<li>Write a variadic <code>longest(*words: str) -&gt; str</code> returning the longest word.</li>
+<li>Write <code>fib(n)</code> recursively. Then write it with a loop. Time both mentally for <code>fib(40)</code> —</li>
+</ol>
+<p>why is one dramatically slower?</p>
+<ol>
+<li>Take a nested expression three calls deep and rewrite it with <code>~&gt;</code>. Decide which you find</li>
+</ol>
+<p>clearer.</p>
+<hr>
+<p><em><a href="/guide-flow">← 2. Decisions and loops</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-collections">4. Collections and text →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

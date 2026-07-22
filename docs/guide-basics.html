@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 1 - First steps - Torvik</title>
+  <meta name="description" content="Install Torvik, write your first program, and learn the raw material of all code - comments, variables, types, operators, and printing with interpolation.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 1 - First steps - Torvik">
+  <meta property="og:description" content="Install Torvik, write your first program, and learn the raw material of all code - comments, variables, types, operators, and printing with interpolation.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 1 - First steps - Torvik">
+  <meta name="twitter:description" content="Install Torvik, write your first program, and learn the raw material of all code - comments, variables, types, operators, and printing with interpolation.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>1. First steps</h1>
+<p><em><a href="/guide">← Guide index</a> · Next: <a href="/guide-flow">2. Decisions and loops →</a></em></p>
+<h2>Installing Torvik</h2>
+<p>Torvik needs <strong>clang</strong> on your system — it's the tool Torvik hands its finished machine code
+to for the final link step. Most Linux systems either have it or install it in one command
+(<code>sudo apt install clang</code>, <code>sudo dnf install clang</code>, and so on). On Windows, install
+<a href="https://github.com/mstorsjo/llvm-mingw/releases">LLVM/clang with the MinGW-w64 toolchain</a>.</p>
+<p>Then install Torvik itself.</p>
+<p><strong>Linux:</strong></p>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
+<p><strong>Windows (PowerShell):</strong></p>
+<pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></pre>
+<p>Open a <strong>new</strong> terminal afterwards so your <code>PATH</code> picks up the change, then check it:</p>
+<pre><code>torvc version
+rune version</code></pre>
+<p><code>torvc</code> is the compiler. <code>rune</code> is the project tool — it creates projects, builds them, and
+keeps your installation up to date. We'll use <code>torvc</code> directly for a while because it's the
+simplest thing that works, and pick up <code>rune</code> in <a href="/guide-projects">Chapter 7</a>.</p>
+<h2>Your first program</h2>
+<p>Create a file called <code>hello.tv</code> with exactly this in it:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    echo!("Hello from Torvik!");
+}</code></pre>
+<p>Compile it and run it:</p>
+<pre><code>torvc hello.tv -o hello
+./hello</code></pre>
+<p>On Windows the last line is <code>.\hello.exe</code>. You should see:</p>
+<pre><code>Hello from Torvik!</code></pre>
+<p>That's a real native executable. You can copy it to another machine of the same kind and it
+runs with nothing else installed.</p>
+<h3>Reading that program line by line</h3>
+<p>Four things are happening, and all four matter.</p>
+<p><strong><code>df main()</code></strong> — <code>df</code> means "define a function." A <strong>function</strong> is a named block of
+instructions. <code>main</code> is a special name: it's the <strong>entry point</strong>, the function the operating
+system calls when your program starts. Every Torvik program has exactly one. The empty
+parentheses <code>()</code> mean it takes no input.</p>
+<p><strong><code>-&gt; void</code></strong> — this says what the function hands back when it finishes. <code>void</code> means
+"nothing." Later you'll write functions that return a number or a piece of text.</p>
+<p><strong><code>{ ... }</code></strong> — curly braces group statements into a block. Everything between them is the
+body of <code>main</code>.</p>
+<p><strong><code>echo!("Hello from Torvik!");</code></strong> — <code>echo!</code> prints a line of text. The text sits in double
+quotes. The <strong>semicolon</strong> ends the statement, the way a period ends a sentence. Torvik needs
+it, and forgetting it is a normal, clean compile error rather than a mystery.</p>
+<h3>When you get it wrong</h3>
+<p>Delete the semicolon and compile again. You'll see something like:</p>
+<pre><code>error: expected a semicolon after this statement
+  --&gt; hello.tv:2:34
+  |
+2 |     echo!("Hello from Torvik!")
+  |                                ^</code></pre>
+<p>The file, the line, the column, a caret under the exact spot. This is how every Torvik error
+reads. Getting comfortable reading them now will save you hours later — they are usually
+telling you precisely what's wrong, not hinting at it.</p>
+<h2>Comments</h2>
+<p>A <strong>comment</strong> is a note for humans. The compiler ignores it completely.</p>
+<pre><code class="language-torvik">// A line comment: from the slashes to the end of the line.
+
+set x: i64 = 1; // Comments can trail a statement too.
+
+#- A block comment. -#
+
+#-
+   Block comments span as many lines as you like.
+   #- And they nest, so you can comment out code
+      that already contains block comments. -#
+-#</code></pre>
+<p>Line comments start with <code>//</code>. Block comments open with <code>#-</code> and close with <code>-#</code>, and they
+<strong>nest</strong> — which sounds like a footnote until the first time you try to comment out a chunk
+of code that already has a block comment inside it, and it just works.</p>
+<p>Comment <em>why</em>, not <em>what</em>. <code>x += 1; // add one to x</code> tells the reader nothing they can't see.
+<code>x += 1; // header row is not data</code> tells them something real.</p>
+<h2>Variables: <code>set</code> and <code>fixed</code></h2>
+<p>A <strong>variable</strong> is a name for a value you want to keep. Torvik has two kinds:</p>
+<ul>
+<li><strong><code>set</code></strong> creates a variable you can change later.</li>
+<li><strong><code>fixed</code></strong> creates one you cannot. Attempting to reassign it is a compile error.</li>
+</ul>
+<p>Both need a <strong>type annotation</strong> — you say up front what kind of value the name holds.</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    set count: i64 = 0;          // a whole number, changeable
+    fixed name: str = "Sigrid";  // a piece of text, permanent
+
+    count = count + 1;           // fine
+    count += 1;                  // shorthand for the same thing
+
+    // name = "Bjorn";           // compile error: name is fixed
+    echo!("{name} has {count}");
+}</code></pre>
+<p>The shape is always:</p>
+<pre><code>set   NAME: TYPE = VALUE;
+fixed NAME: TYPE = VALUE;</code></pre>
+<p><strong>Reach for <code>fixed</code> by default.</strong> Use <code>set</code> only when a value genuinely needs to change. A
+<code>fixed</code> binding is a promise to everyone reading the code — including you in six months —
+that this value is settled, and the compiler enforces it. Most values in a well-written
+program never change after they're first assigned.</p>
+<h3>Naming</h3>
+<p>Use lowercase words joined by underscores: <code>user_count</code>, <code>total_price</code>, <code>is_ready</code>. Names
+should say what the value <em>is</em>. <code>n</code> is fine for a loop counter; <code>d</code> is not fine for
+"days remaining."</p>
+<h2>Types</h2>
+<p>A <strong>type</strong> is the kind of value a name holds. Torvik checks every one of them at compile
+time.</p>
+<h3>Whole numbers (integers)</h3>
+<p>Torvik has integer types in several sizes. The size controls how large a number it can hold
+and how much memory it uses.</p>
+<p><strong>Signed</strong> (can be negative): <code>i8</code>, <code>i16</code>, <code>i32</code>, <code>i64</code>
+<strong>Unsigned</strong> (zero or positive only): <code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code>
+<strong>Wide</strong>: <code>i128</code>, <code>u128</code></p>
+<pre><code class="language-torvik">set a: i64 = 42;
+set small: u8 = 255;                        // 0 to 255
+set huge: i128 = 100000000000000000000;     // far beyond i64's range</code></pre>
+<p><strong>Use <code>i64</code> unless you have a reason not to.</strong> It's the everyday integer: it holds values up
+to about 9.2 quintillion, which covers essentially everything. The smaller types exist for
+when you're packing data tightly or matching an external format; the 128-bit types for when
+you genuinely outgrow 64 bits.</p>
+<p>A leading <code>-</code> negates a value: <code>-5</code>, or <code>set n: i64 = -x;</code>.</p>
+<h3>Decimals</h3>
+<p><code>f64</code> is a 64-bit floating-point number — a decimal.</p>
+<pre><code class="language-torvik">fixed pi: f64 = 3.14159;
+echo!(pi);       // 3.14159
+echo!(2.0);      // 2.0 - floats always print with a decimal point</code></pre>
+<p>One thing to know early, and it's true in every language, not just Torvik: floating-point
+numbers are <em>approximations</em>. <code>0.1 + 0.2</code> is not exactly <code>0.3</code> in binary floating point.
+This is fine for measurements and averages. For money, work in whole cents with an integer
+instead.</p>
+<h3>True and false</h3>
+<p><code>bool</code> holds exactly one of two values: <code>true</code> or <code>false</code>.</p>
+<pre><code class="language-torvik">fixed ready: bool = true;
+fixed empty: bool = false;</code></pre>
+<p>Booleans are what conditions produce, and they're the foundation of every decision your
+program makes.</p>
+<h3>Text</h3>
+<p><code>str</code> holds text — a "string" of characters. String literals use double quotes.</p>
+<pre><code class="language-torvik">fixed greeting: str = "hello";
+fixed letter: str = 'A';        // single quotes: a one-character string</code></pre>
+<p>Single quotes give you a <strong>character literal</strong>, which in Torvik is simply a one-character
+string.</p>
+<p>Two builtins bridge text and numbers:</p>
+<pre><code class="language-torvik">echo!(char_at("hello", 1));   // "e"  - the character at index 1, as a string
+echo!(byte_at("hello", 1));   // 101  - its raw numeric byte value
+echo!(chr(65));               // "A"  - the character for byte value 65</code></pre>
+<p><strong>Indexes start at 0.</strong> The first character is at index <code>0</code>, the second at <code>1</code>. This trips up
+everyone at first and then becomes second nature.</p>
+<h3>Collections, briefly</h3>
+<p><code>list&lt;T&gt;</code>, <code>table&lt;K, V&gt;</code>, and <code>bag&lt;T&gt;</code> hold many values at once. They get a
+<a href="/guide-collections">whole chapter</a>.</p>
+<h2>Operators</h2>
+<p>Operators combine values.</p>
+<p><strong>Arithmetic:</strong> <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code></p>
+<pre><code class="language-torvik">echo!(7 + 3);    // 10
+echo!(7 - 3);    // 4
+echo!(7 * 3);    // 21
+echo!(7 / 3);    // 2  - integer division truncates toward zero
+echo!(7 % 3);    // 1  - the remainder</code></pre>
+<p>Integer division throws away the fractional part: <code>7 / 3</code> is <code>2</code>, not <code>2.33</code>. If you want the
+decimal, use <code>f64</code> values. The <code>%</code> operator ("modulo") gives the remainder, and it's more
+useful than it looks — <code>n % 2 == 0</code> tests whether <code>n</code> is even.</p>
+<p><strong>Comparison:</strong> <code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> — these produce a <code>bool</code>.</p>
+<pre><code class="language-torvik">echo!(5 == 5);   // true
+echo!(5 != 5);   // false
+echo!(3 &lt; 5);    // true</code></pre>
+<p>Note <code>==</code> (two equals signs) <em>compares</em>, while <code>=</code> (one) <em>assigns</em>. Mixing them up is a rite
+of passage.</p>
+<p><strong>Logical:</strong> <code>&amp;&amp;</code> (and), <code>||</code> (or), <code>!</code> (not)</p>
+<pre><code class="language-torvik">fixed a: bool = true;
+fixed b: bool = false;
+
+echo!(a &amp;&amp; b);        // false - both must be true
+echo!(a || b);        // true  - at least one must be true
+echo!(!a);            // false - flips it
+fixed all: bool = a &amp;&amp; !b;   // combine freely</code></pre>
+<p>These <strong>short-circuit</strong>: in <code>a &amp;&amp; b</code>, if <code>a</code> is false, <code>b</code> is never evaluated at all.</p>
+<p><strong>Bitwise:</strong> <code>&amp;</code> <code>|</code> <code>^</code> <code>~</code> <code>&lt;&lt;</code> <code>&gt;&gt;</code> operate on the individual binary digits of integers.
+You can ignore these until you need them — flags, low-level formats, and hashing are the
+usual reasons.</p>
+<pre><code class="language-torvik">echo!(6 &amp; 3);    // 2
+echo!(1 &lt;&lt; 3);   // 8  - shift left three places: 1 becomes 8</code></pre>
+<p><strong>Compound assignment:</strong> <code>+=</code> <code>-=</code> <code>*=</code> <code>/=</code> <code>%=</code> update a variable in place.</p>
+<pre><code class="language-torvik">set x: i64 = 10;
+x += 5;    // x is now 15; same as x = x + 5
+x *= 2;    // 30</code></pre>
+<h3>Precedence</h3>
+<p>Multiplication and division bind tighter than addition and subtraction, as in ordinary
+arithmetic; arithmetic binds tighter than comparison.</p>
+<pre><code class="language-torvik">echo!(2 + 3 * 4);      // 14, not 20
+echo!((2 + 3) * 4);    // 20</code></pre>
+<p><strong>Use parentheses whenever they make the intent clearer.</strong> Nobody has ever complained about
+a parenthesis that made a line obvious.</p>
+<h2>Printing and interpolation</h2>
+<p><code>echo!</code> prints with a newline at the end. <code>echo</code> prints without one.</p>
+<pre><code class="language-torvik">echo("Loading... ");
+echo!("done.");        // both appear on one line</code></pre>
+<p><code>echo</code> handles any printable scalar: strings, every integer width, <code>f64</code>, and <code>bool</code>.</p>
+<h3>Putting values into text</h3>
+<p>This is where Torvik is nicer than most languages. You don't need a formatting function —
+<code>echo</code> does <strong>interpolation</strong> directly. Any <code>{name}</code> inside the string is replaced with that
+variable's value, formatted correctly for its type.</p>
+<pre><code class="language-torvik">fixed name: str = "Odin";
+set count: i64 = 3;
+fixed ratio: f64 = 0.5;
+fixed ok: bool = true;
+
+echo!("Hello {name}!");              // Hello Odin!
+echo!("{name} has {count} runes");   // Odin has 3 runes
+echo!("ratio={ratio}, ok={ok}");     // ratio=0.5, ok=true</code></pre>
+<p>The braces can hold a <strong>full expression</strong>, not just a name:</p>
+<pre><code class="language-torvik">echo!("total: {price * qty}");    // arithmetic
+echo!("doubled: {dbl(count)}");   // a function call
+echo!("first: {runes[0]}");       // an index</code></pre>
+<p>For a literal brace, double it: <code>{{</code> and <code>}}</code>.</p>
+<p><code>echo</code> also takes several comma-separated arguments, printed in order with spaces between:</p>
+<pre><code class="language-torvik">echo!("count:", count);            // count: 3
+echo!(name, "rolled", count);      // Odin rolled 3</code></pre>
+<h3>Building a string instead of printing one</h3>
+<p>When you want the <em>text itself</em> as a value — to store it, pass it, or return it — use <code>fmt</code>.
+It interpolates exactly like <code>echo</code>, but hands back a <code>str</code>:</p>
+<pre><code class="language-torvik">fixed who: str = "World";
+set n: i64 = 3;
+fixed line: str = fmt("Hi {who}, n={n}");   // a str you can keep</code></pre>
+<p><code>fmt</code> also supports <strong>positional</strong> placeholders — empty <code>{}</code> filled from the trailing
+arguments, left to right:</p>
+<pre><code class="language-torvik">fixed label: str = fmt("{} + {} = {}", 2, 3, 5);   // "2 + 3 = 5"</code></pre>
+<p>In short: <code>echo</code> when printing, <code>fmt</code> when you need the string as a value or want positional
+holes.</p>
+<h3>Everywhere else, a string is just a string</h3>
+<p>Interpolation applies <strong>only</strong> to a string literal written directly as an argument to <code>echo</code>,
+<code>echo!</code>, or <code>fmt</code>. Anywhere else, braces are ordinary characters:</p>
+<pre><code class="language-torvik">fixed css: str = ".a{color:red}";   // exactly that text, untouched
+fixed slot: str = "Guide 1 - First steps";      // exactly Guide 1 - First steps
+echo!(slot);                        // prints Guide 1 - First steps</code></pre>
+<p>That last line is the important one: interpolation happens at <strong>compile time on literals</strong>,
+never at run time on values. A variable that happens to contain braces prints them exactly as
+they are. This is what lets CSS, JSON, and HTML templates sit in ordinary strings with no
+escaping.</p>
+<h2>Putting it together</h2>
+<p>A program using everything from this chapter:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    fixed name: str = "Astrid";
+    fixed price: i64 = 250;
+    fixed qty: i64 = 3;
+
+    set total: i64 = price * qty;
+    total += 50;                          // shipping
+
+    fixed free_shipping: bool = total &gt; 500;
+
+    echo!("Customer: {name}");
+    echo!("{qty} items at {price} each");
+    echo!("Total: {total}");
+    echo!("Free shipping: {free_shipping}");
+}</code></pre>
+<p>Save it, compile it, run it. Then change the numbers and run it again.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Print your name and age using interpolation in a single <code>echo!</code>.</li>
+<li>Compute how many minutes are in a week, printing the result with a label.</li>
+<li>Make a <code>fixed</code> variable and try to reassign it. Read the error carefully.</li>
+<li>Work out <code>17 / 5</code> and <code>17 % 5</code> on paper, then check yourself with a program.</li>
+<li>Build a string with <code>fmt</code> using positional <code>{}</code> placeholders and print it.</li>
+<li>Print a literal <code>{hello}</code> — braces and all — without interpolation kicking in. (Two ways:</li>
+</ol>
+<p>escape them, or put the text in a variable first.)</p>
+<hr>
+<p><em><a href="/guide">← Guide index</a> · Next: <a href="/guide-flow">2. Decisions and loops →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Language Guide - Torvik</title>
+  <meta name="description" content="Learn the Torvik programming language from scratch - a complete, detailed tutorial that takes you from no programming experience at all to writing real, concurrent, production Torvik programs.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Language Guide - Torvik">
+  <meta property="og:description" content="Learn the Torvik programming language from scratch - a complete, detailed tutorial that takes you from no programming experience at all to writing real, concurrent, production Torvik programs.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Language Guide - Torvik">
+  <meta name="twitter:description" content="Learn the Torvik programming language from scratch - a complete, detailed tutorial that takes you from no programming experience at all to writing real, concurrent, production Torvik programs.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>The Torvik Language Guide</h1>
+<p>This is the complete guide to Torvik. It starts from nothing — no programming experience
+assumed — and goes all the way through the language, including memory, concurrency, and
+shipping real projects.</p>
+<p>You don't need to have written code before. You don't need to know another language. Every
+concept is introduced before it's used, and every example is a complete, runnable program or
+a fragment you can drop into one.</p>
+<p>If you <em>have</em> programmed before, skim <a href="/guide-basics">Chapter 1</a> for the syntax and jump to
+whatever you need — the chapters stand on their own once you know how a Torvik program is
+laid out.</p>
+<h2>What is Torvik?</h2>
+<p>Torvik is a <strong>compiled, statically-typed, general-purpose programming language</strong>.</p>
+<p>Piece by piece:</p>
+<ul>
+<li><strong>Compiled</strong> — you write a text file, run it through the Torvik compiler (<code>torvc</code>), and get</li>
+</ul>
+<p>a native executable: a real program your operating system runs directly. There's no
+interpreter or virtual machine sitting underneath it at run time.</p>
+<ul>
+<li><strong>Statically typed</strong> — every value has a type (a whole number, a piece of text, a list of</li>
+</ul>
+<p>things), and the compiler knows all of them before your program ever runs. If you try to
+add a number to a word, you're told at compile time, not by a crash in front of a user.</p>
+<ul>
+<li><strong>General-purpose</strong> — it isn't aimed at one niche. Command-line tools, servers, text</li>
+</ul>
+<p>processing, build tooling, small web services.</p>
+<p>Two more things make it unusual:</p>
+<ul>
+<li><strong>No garbage collector.</strong> Memory is reclaimed automatically using reference counting, which</li>
+</ul>
+<p>means cleanup is <em>deterministic</em> — it happens at a predictable moment, not whenever a
+collector decides to run. You never write <code>free</code>, and you never get a surprise pause.</p>
+<ul>
+<li><strong>It is written in itself.</strong> The Torvik compiler is a Torvik program. It compiles its own</li>
+</ul>
+<p>source code into the next version of itself, and the result is byte-for-byte identical
+every time. A language that can build itself is a language that has to be genuinely
+complete.</p>
+<p>The keywords are Norse-inspired — <code>df</code> to define a function, <code>check</code> for a condition,
+<code>whilst</code> for a loop, <code>raven</code> to spawn a concurrent task. They read as words, not
+abbreviations, and they're consistent: there is one way to say each thing.</p>
+<h2>How to use this guide</h2>
+<p>Work through it in order the first time. Each chapter builds on the one before, and later
+chapters assume the vocabulary of earlier ones.</p>
+<p>Type the examples out rather than copying them. Programming is a motor skill as much as an
+intellectual one, and the mistakes you make while typing are where most of the learning
+happens. When something doesn't compile, read the error — Torvik's errors point at the exact
+character and say what it expected.</p>
+<p>Every chapter ends with things to try. They're worth doing.</p>
+<h2>The chapters</h2>
+<p><strong><a href="/guide-basics">1. First steps</a></strong>
+Installing Torvik, your first program, and the raw material of all code: comments, variables,
+types, operators, and printing. By the end you can write a program that stores values, does
+arithmetic, and shows results.</p>
+<p><strong><a href="/guide-flow">2. Making decisions and repeating work</a></strong>
+Branching with <code>check</code> and <code>fallback</code>, the <code>?&gt;</code> ternary, early exits with <code>guard</code>, loops with
+<code>whilst</code> and <code>each</code>, and pattern matching with <code>aett</code> and <code>when</code>.</p>
+<p><strong><a href="/guide-functions">3. Functions</a></strong>
+Defining your own operations with <code>df</code>, parameters and return values, optional (<code>^</code>) and
+variadic (<code>*</code>) parameters, recursion, scope, and the weave operator <code>~&gt;</code>.</p>
+<p><strong><a href="/guide-collections">4. Collections and text</a></strong>
+Lists, tables, and bags — storing many values at once — plus the full set of string
+operations and the membership operator <code>&lt;|</code>.</p>
+<p><strong><a href="/guide-errors">5. Errors, safety, and the compiler on your side</a></strong>
+Handling failure with <code>result</code>, <code>ok</code>, and <code>err</code>; asserting invariants with <code>vow</code> and <code>halt</code>;
+reading compile warnings; and the narrow, explicit <code>unsafe</code> prefix.</p>
+<p><strong><a href="/guide-concurrency">6. Concurrency: ravens and bridges</a></strong>
+Doing several things at once. Spawning tasks with <code>raven</code>, passing values over typed <code>bridge</code>
+channels, and why Torvik gives you no way to write a data race.</p>
+<p><strong><a href="/guide-projects">7. Modules, the standard library, and real projects</a></strong>
+Splitting code across files with <code>apply</code>, using the standard library, and building and
+shipping projects with <code>rune</code>.</p>
+<p><strong><a href="/guide-reference">Appendix: full reference</a></strong>
+Every keyword and operator in one place, the memory model in detail, and an honest list of
+what the language does not do yet.</p>
+<h2>Before you start</h2>
+<p>You'll need two things: a text editor and the Torvik toolchain.</p>
+<p>Any editor works — Notepad, TextEdit, VS Code, Vim. Torvik source files end in <code>.tv</code> and are
+plain text.</p>
+<p>Installing the toolchain takes one command, covered at the top of
+<a href="/guide-basics">Chapter 1</a>. Torvik runs on <strong>Linux</strong> and <strong>Windows</strong> (x86-64). macOS support
+is planned once Apple hardware is available for credible testing.</p>
+<p>Ready? <a href="/guide-basics">Start with Chapter 1 →</a></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

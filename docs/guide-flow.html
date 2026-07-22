@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 2 - Decisions and loops - Torvik</title>
+  <meta name="description" content="Branch with check and fallback, use the ternary, exit early with guard, repeat work with whilst and each, and match patterns with aett and when.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 2 - Decisions and loops - Torvik">
+  <meta property="og:description" content="Branch with check and fallback, use the ternary, exit early with guard, repeat work with whilst and each, and match patterns with aett and when.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 2 - Decisions and loops - Torvik">
+  <meta name="twitter:description" content="Branch with check and fallback, use the ternary, exit early with guard, repeat work with whilst and each, and match patterns with aett and when.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>2. Making decisions and repeating work</h1>
+<p><em><a href="/guide-basics">← 1. First steps</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-functions">3. Functions →</a></em></p>
+<p>So far every program has run straight down the page. Real programs need to choose between
+paths and repeat work. That's this chapter.</p>
+<h2>Conditions: <code>check</code> and <code>fallback</code></h2>
+<p><code>check</code> runs a block only when a condition is true. It's what other languages call <code>if</code>.</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    fixed temperature: i64 = 30;
+
+    check temperature &gt; 25 {
+        echo!("It's warm.");
+    }
+}</code></pre>
+<p>The condition sits between <code>check</code> and the <code>{</code>. No parentheses needed (though you can add
+them for clarity). The block runs only if the condition is <code>true</code>.</p>
+<p>Add <code>fallback</code> for the "otherwise" path:</p>
+<pre><code class="language-torvik">check temperature &gt; 25 {
+    echo!("It's warm.");
+} fallback {
+    echo!("It's cool.");
+}</code></pre>
+<p>Exactly one of those two blocks runs. Chain them for several cases:</p>
+<pre><code class="language-torvik">check score &gt;= 90 {
+    echo!("excellent");
+} fallback {
+    check score &gt;= 70 {
+        echo!("good");
+    } fallback {
+        echo!("keep practising");
+    }
+}</code></pre>
+<p>Conditions combine with <code>&amp;&amp;</code>, <code>||</code>, and <code>!</code>:</p>
+<pre><code class="language-torvik">check age &gt;= 13 &amp;&amp; age &lt; 20 {
+    echo!("teenager");
+}
+
+check is_admin || is_owner {
+    echo!("has access");
+}
+
+check !is_locked {
+    echo!("you may enter");
+}</code></pre>
+<p>Since v1.4.0 a boolean expression can also be <strong>stored</strong>, which often reads better than
+burying the logic in the condition:</p>
+<pre><code class="language-torvik">fixed can_edit: bool = is_admin || is_owner;
+fixed ready: bool = is_loaded &amp;&amp; !is_locked &amp;&amp; has_data;
+
+check can_edit {
+    echo!("editing allowed");
+}</code></pre>
+<p>A boolean-returning call can be compared against a literal directly:</p>
+<pre><code class="language-torvik">check contains(line, "error") == false {
+    echo!("line is clean");
+}</code></pre>
+<h2>The ternary: <code>?&gt;</code> and <code>!&gt;</code></h2>
+<p>Sometimes you want to <em>choose a value</em>, not run a block. Torvik's conditional expression is
+<code>condition ?&gt; value_if_true !&gt; value_if_false</code>. Read <code>?&gt;</code> as "then" and <code>!&gt;</code> as "else."</p>
+<pre><code class="language-torvik">set n: i64 = 7;
+fixed parity: str = n % 2 == 0 ?&gt; "even" !&gt; "odd";   // "odd"
+
+echo!(n &gt; 0 ?&gt; "positive" !&gt; "non-positive");</code></pre>
+<p>Compare that with the <code>check</code> version — four lines and a mutable variable versus one line and
+a <code>fixed</code> one. When you're picking between two values, the ternary is usually clearer.</p>
+<p>Ternaries chain to the right for several cases:</p>
+<pre><code class="language-torvik">fixed sign: str = n &gt; 0 ?&gt; "positive"
+               !&gt; n &lt; 0 ?&gt; "negative"
+               !&gt; "zero";</code></pre>
+<p>Both branches must be the same kind of type — two numbers, or two strings, not one of each.</p>
+<p>The ternary <strong>short-circuits</strong>: only the branch actually taken is evaluated. That makes it
+safe as a guard:</p>
+<pre><code class="language-torvik">fixed safe: i64 = d != 0 ?&gt; 100 / d !&gt; 0;   // never divides by zero</code></pre>
+<p>Don't nest ternaries more than about two deep. Past that, <code>check</code> blocks or a <code>when</code> are
+kinder to read.</p>
+<h2>Early exits: <code>guard</code></h2>
+<p><code>guard</code> states a condition that <strong>must</strong> hold for the code to continue. If it's false, the
+<code>fallback</code> block runs — usually to return early.</p>
+<pre><code class="language-torvik">df reciprocal_label(n: i64) -&gt; str {
+    guard n != 0 fallback {
+        return "undefined";
+    }
+    // Past this point, n is guaranteed non-zero.
+    return "defined";
+}</code></pre>
+<p>The value of <code>guard</code> is that it keeps the <strong>happy path unindented</strong>. Compare:</p>
+<pre><code class="language-torvik">// With guards - the real work stays at the left margin
+df process(name: str, age: i64) -&gt; str {
+    guard len(name) &gt; 0 fallback { return "name required"; }
+    guard age &gt;= 0      fallback { return "age cannot be negative"; }
+    guard age &lt; 150     fallback { return "age looks wrong"; }
+
+    return fmt("{name} is {age}");
+}</code></pre>
+<p>Every precondition is stated once, up front, next to its error message. The alternative —
+nesting three <code>check</code> blocks — pushes the actual work three levels deep and puts each error
+message far from the test that triggers it.</p>
+<p>If a guard's condition is compound, wrap it in parentheses:</p>
+<pre><code class="language-torvik">guard (a &gt; 0 &amp;&amp; b &gt; 0) fallback { return "both must be positive"; }</code></pre>
+<h2>Loops: <code>whilst</code></h2>
+<p><code>whilst</code> repeats a block as long as a condition stays true.</p>
+<pre><code class="language-torvik">set i: i64 = 0;
+whilst i &lt; 5 {
+    echo!(i);       // 0 1 2 3 4
+    i += 1;
+}</code></pre>
+<p>Three things have to be right, and getting any of them wrong is the classic beginner bug:</p>
+<ol>
+<li><strong>Initialize</strong> — <code>i</code> starts at <code>0</code>.</li>
+<li><strong>Test</strong> — the loop continues while <code>i &lt; 5</code>.</li>
+<li><strong>Advance</strong> — <code>i += 1</code> moves toward the end.</li>
+</ol>
+<p>Forget step 3 and the condition never becomes false: the loop runs forever. If a program
+hangs, a missing advance is the first thing to check. (Ctrl-C stops it.)</p>
+<p><code>whilst true { ... }</code> is a deliberate infinite loop, which is fine when something inside
+breaks out of it.</p>
+<h2>Loops: <code>each</code></h2>
+<p>When you want to count through a range of numbers, <code>each</code> says it more directly.</p>
+<pre><code class="language-torvik">each i in 0..5 {
+    echo!(i);       // 0 1 2 3 4
+}</code></pre>
+<p><code>START..END</code> is <strong>exclusive</strong> — the end value is not included. <code>0..5</code> gives you five
+iterations: 0, 1, 2, 3, 4. That pairs perfectly with zero-based indexing.</p>
+<p>For an inclusive range, use <code>..+</code>:</p>
+<pre><code class="language-torvik">each i in 0..+5 {
+    echo!(i);       // 0 1 2 3 4 5
+}</code></pre>
+<p><code>each</code> handles the counter for you — there's no variable to forget to advance, so an <code>each</code>
+loop can't spin forever. Prefer it over <code>whilst</code> whenever you know the range in advance.</p>
+<pre><code class="language-torvik">set sum: i64 = 0;
+each k in 1..+100 {
+    sum += k;
+}
+echo!("1 to 100 sums to {sum}");   // 5050</code></pre>
+<p>You can also iterate a <strong>list</strong> directly, which we'll use constantly in
+<a href="/guide-collections">Chapter 4</a>:</p>
+<pre><code class="language-torvik">each word in words {
+    echo!(word);
+}</code></pre>
+<h2><code>break</code> and <code>continue</code></h2>
+<p><code>break</code> leaves the loop immediately. <code>continue</code> skips the rest of this pass and starts the
+next one.</p>
+<pre><code class="language-torvik">each i in 0..10 {
+    check i == 3 { break; }    // stops entirely at 3
+    echo!(i);                  // 0 1 2
+}
+
+each i in 0..5 {
+    check i == 2 { continue; } // skips just 2
+    echo!(i);                  // 0 1 3 4
+}</code></pre>
+<p>Both work in <code>whilst</code> and <code>each</code>. In an <code>each</code> loop, <code>continue</code> still advances the counter,
+so it can't cause an infinite loop.</p>
+<p>A common shape — search a range and stop at the first hit:</p>
+<pre><code class="language-torvik">set found: i64 = -1;
+each i in 0..len(xs) {
+    check xs[i] == target {
+        found = i;
+        break;                 // no point looking further
+    }
+}</code></pre>
+<h2>Named values: <code>aett</code></h2>
+<p>An <strong>aett</strong> is a family of named values — an enumeration. It's named for the <em>ættir</em>, the
+families the runes of the futhark are grouped into.</p>
+<p>Use one whenever a value has a small, fixed set of possibilities. Instead of remembering that
+status <code>0</code> means pending and <code>2</code> means closed, you name them:</p>
+<pre><code class="language-torvik">aett Status { Pending, Active, Closed }
+
+df main() -&gt; void {
+    set s: Status = Status::Pending;
+    echo!(s);              // 0 - variants are i64 ordinals in declaration order
+    echo!(typeof(s));      // Status
+
+    s = Status::Closed;
+    check s == Status::Closed {
+        echo!("closed");
+    }
+}</code></pre>
+<p>Declare an aett at the <strong>top level</strong> of the file, not inside a function. Access variants with
+<code>::</code>.</p>
+<p>Aett values are backed by <code>i64</code> ordinals, so they print, compare, store in lists, and pass to
+functions like any integer — while the aett name works as a real type annotation for
+variables, parameters, and return types.</p>
+<h2>Pattern matching: <code>when</code></h2>
+<p><code>when</code> matches a value against a set of patterns. Arms use <code>=&gt;</code>, with either a single
+statement or a block on the right:</p>
+<pre><code class="language-torvik">aett Status { Pending, Active, Closed }
+
+df describe(s: Status) -&gt; str {
+    when s {
+        Status::Pending =&gt; return "waiting";
+        Status::Active  =&gt; return "live";
+        Status::Closed  =&gt; return "done";
+    }
+    return "";
+}</code></pre>
+<p>Here's the part that makes <code>when</code> genuinely valuable. When the value being matched is
+aett-typed and there's no <code>fallback</code> arm, the compiler checks <strong>exhaustiveness</strong>: if you
+haven't covered every variant, it's a clean compile error naming exactly which one you
+missed.</p>
+<p>That turns a whole category of bug into a compile error. Add a fourth variant to <code>Status</code> six
+months from now, and the compiler immediately points at every <code>when</code> that needs updating —
+instead of your program silently taking a wrong branch in production.</p>
+<p><code>when</code> also matches integers, using literal patterns. Here a <code>fallback</code> arm is <strong>required</strong>,
+because the compiler can't prove that a handful of literals cover every possible integer:</p>
+<pre><code class="language-torvik">when n {
+    1        =&gt; echo!("one");
+    7        =&gt; echo!("seven");
+    fallback =&gt; echo!("many");
+}</code></pre>
+<p>Arms can be blocks when you need more than one statement:</p>
+<pre><code class="language-torvik">when s {
+    Status::Active =&gt; {
+        echo!("running");
+        start_timer();
+    }
+    fallback =&gt; echo!("not running");
+}</code></pre>
+<p>As everywhere in Torvik, <code>fallback</code> comes last.</p>
+<h2>Putting it together</h2>
+<p>A number-guessing scorer using most of this chapter:</p>
+<pre><code class="language-torvik">aett Verdict { TooLow, Correct, TooHigh }
+
+df judge(guess: i64, secret: i64) -&gt; Verdict {
+    check guess &lt; secret { return Verdict::TooLow; }
+    check guess &gt; secret { return Verdict::TooHigh; }
+    return Verdict::Correct;
+}
+
+df main() -&gt; void {
+    fixed secret: i64 = 42;
+    set guesses: i64 = 0;
+    set current: i64 = 0;
+
+    each attempt in 1..+10 {
+        current = attempt * 9;          // stand-in for real input
+        guesses += 1;
+
+        fixed v: Verdict = judge(current, secret);
+
+        when v {
+            Verdict::Correct =&gt; {
+                echo!("Got it in {guesses}: {current}");
+                break;
+            }
+            Verdict::TooLow  =&gt; echo!("{current} is too low");
+            Verdict::TooHigh =&gt; echo!("{current} is too high");
+        }
+    }
+}</code></pre>
+<p>Note the <code>when</code> has no <code>fallback</code> and covers all three variants — the compiler verified that
+for you.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Print the numbers 1 to 20, but for multiples of 3 print <code>"fizz"</code> instead. (<code>%</code> is your</li>
+</ol>
+<p>friend.)</p>
+<ol>
+<li>Rewrite that using a ternary inside the <code>echo!</code>.</li>
+<li>Write a function that grades a score 0–100 into an <code>aett</code> of <code>Fail</code>, <code>Pass</code>, <code>Merit</code>,</li>
+</ol>
+<p><code>Distinction</code>, then <code>when</code> over it. Delete one arm and read the error.</p>
+<ol>
+<li>Sum the even numbers between 1 and 100 using <code>each</code> and <code>continue</code>.</li>
+<li>Take the <code>process</code> guard example and rewrite it with nested <code>check</code> blocks instead. Decide</li>
+</ol>
+<p>for yourself which you'd rather maintain.</p>
+<ol>
+<li>Write a <code>whilst</code> loop that deliberately never ends, run it, and stop it with Ctrl-C. Then</li>
+</ol>
+<p>fix it. Knowing what a hang feels like is useful.</p>
+<hr>
+<p><em><a href="/guide-basics">← 1. First steps</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-functions">3. Functions →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>
