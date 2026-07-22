@@ -45,12 +45,13 @@ rune run
 
 ```
 rune update            # update to the latest release
-rune update v1.3       # or pin: a release with 1.3.x 
+rune update v1.4       # or pin: the newest 1.4.x release
 rune version           # see what you're running
 ```
 
 `rune update` fetches the release, verifies it, and swaps it in place;
-`rune uninstall` removes the toolchain cleanly if you ever want it gone.
+`rune uninstall` removes the toolchain cleanly if you ever want it gone. See the
+[rune page](/rune) for the full command set.
 
 ## Why Torvik
 
@@ -62,6 +63,10 @@ rune version           # see what you're running
 - **Concurrency without data races** - spawn tasks with `raven`, pass values over typed
   `bridge` channels. Values copy as they cross a thread, so tasks share no mutable
   state - a data race is not something you avoid, it is something you cannot write.
+- **Flexible, checked function calls** - optional (`^`) and variadic (`*`) parameters, with
+  every argument type-checked at the call site so a mismatch is a clean error, not a crash.
+- **Networking, opt-in** - `apply std::net;` adds a small HTTP layer with binary-safe file
+  serving; the transport primitives dead-strip out of programs that never use them.
 - **A small, sharp type system** - integer widths `i8` through `u128`, `f64`, `bool`,
   `str`, the `list`, `table`, and `bag` collections, `result` for explicit error
   handling, and `aett` enumerations with exhaustiveness-checked `when` matching.
@@ -103,21 +108,24 @@ df main() -> void {
 }
 ```
 
-Take the [full tour](tour.html) for more of the language.
+Take the [full tour](/tour) for a quick look at more of the language, or start the
+[Language Guide](/guide) to learn Torvik properly from the beginning.
 
 ## Built with Torvik
 
 > The Norns sit at the well beneath the world-tree, weaving the threads of fate.
 
-[Vefna](vefna.html) is a static site generator written entirely in Torvik - it renders
+[Vefna](/vefna) is a static site generator written entirely in Torvik - it renders
 pages in parallel on eight raven worker threads, and it wove the page you are reading
 right now.
 
 ## Learn more
 
-- [The Torvik Guide](https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md) - full tutorial and language reference
-- [Standard library](https://github.com/torvik-lang/torvik/blob/main/docs/STDLIB.md) - built-in function reference
-- [Tooling](https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md) - `torvc` and `rune`
+- [Language Guide](/guide) - the complete tutorial, from no programming experience to concurrent programs
+- [Reference](/guide-reference) - every keyword, operator, and built-in function in one place
+- [Tour](/tour) - a quick tasting menu of the language
+- [rune](/rune) - the project and toolchain manager (install, update, uninstall)
+- [Vefna](/vefna) - the static site generator woven in Torvik
 - [Wiki](https://github.com/torvik-lang/torvik/wiki) - guides and FAQ
 - [Releases](https://github.com/torvik-lang/torvik/releases) - changelogs and binaries
 - [Discussions](https://github.com/torvik-lang/torvik/discussions) - questions, ideas, and show-and-tell
