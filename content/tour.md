@@ -5,8 +5,9 @@ description: A tour of the Torvik language - variables, functions, pattern match
 
 # A tour of Torvik
 
-Everything below is real, compiling Torvik. For the full story, read
-[the Guide](https://github.com/torvik-lang/torvik/blob/main/docs/GUIDE.md).
+Everything below is real, compiling Torvik. This is the quick tasting menu — for the full
+story, start with the [Language Guide](/guide), which teaches the whole language from the
+beginning.
 
 ## Variables
 
@@ -26,6 +27,26 @@ Functions are declared with `df`. Every parameter and return type is explicit.
 df square(n: i64) -> i64 {
     return n * n;
 }
+```
+
+A parameter marked `^` is **optional** (callers may omit it, and it takes a
+type-appropriate zero); a trailing `*` parameter is **variadic**, gathering the
+remaining arguments into a `list`. Every argument is type-checked at the call site.
+
+```torvik
+df greet(name: str, ^greeting: str) -> void {
+    check greeting == "" { greeting = "Hail"; }
+    echo!("{greeting}, {name}!");
+}
+
+df loudest(*words: str) -> str {
+    set best: str = "";
+    each w in words { check len(w) > len(best) { best = w; } }
+    return best;
+}
+
+greet("Astrid");            // Hail, Astrid!
+greet("Bjorn", "Well met"); // Well met, Bjorn!
 ```
 
 ## Printing and interpolation
@@ -153,5 +174,8 @@ fixed keys: list<str> = table_keys(cfg);   // sorted, so loops are reproducible
 
 ---
 
-Ready to write some? [Install Torvik](index.html) and `rune new` your first project -
-or see how far the language goes in [Vefna](vefna.html), a real tool built with it.
+Ready to learn it properly? Start the [Language Guide](/guide) — it goes from no programming
+experience at all through to concurrency and shipping real projects.
+
+Or [install Torvik](/) and `rune new` your first project, and see how far the language goes
+in [Vefna](/vefna), a real tool built with it.
