@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 6 - Concurrency - Torvik</title>
+  <meta name="description" content="Run work on several threads with raven tasks and typed bridge channels - a model where data races are not something you avoid, but something you cannot write.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 6 - Concurrency - Torvik">
+  <meta property="og:description" content="Run work on several threads with raven tasks and typed bridge channels - a model where data races are not something you avoid, but something you cannot write.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 6 - Concurrency - Torvik">
+  <meta name="twitter:description" content="Run work on several threads with raven tasks and typed bridge channels - a model where data races are not something you avoid, but something you cannot write.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>6. Concurrency: ravens and bridges</h1>
+<p><em><a href="/guide-errors">← 5. Errors and safety</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-projects">7. Modules and projects →</a></em></p>
+<p>Modern processors have many cores. A program that runs on one is leaving most of the machine
+idle. <strong>Concurrency</strong> is doing several things at once.</p>
+<p>It's also the area where most languages hurt you. Two threads touching the same data at the
+same time produce a <strong>data race</strong>: a bug that appears one run in a thousand, vanishes when
+you add a print statement, and cannot be reproduced on demand.</p>
+<p>Torvik's answer is structural. <strong>Tasks share no mutable state.</strong> Values are copied as they
+cross a thread boundary, so a data race isn't something you avoid by being careful — it's
+something the language gives you no way to express.</p>
+<p>Two ideas do the work: a <strong>raven</strong> carries a task to its own thread and comes back with what
+it found; a <strong>bridge</strong> is a typed channel carrying values between tasks.</p>
+<h2>Ravens: spawning tasks</h2>
+<p><code>raven</code> prefixes a call to one of your <code>df</code> functions and runs it on a new OS thread.</p>
+<p><strong>Fire and forget</strong> — start it and move on:</p>
+<pre><code class="language-torvik">raven log_event("started");     // runs on its own thread; main does not wait</code></pre>
+<p><strong>With a handle</strong> — capture it so you can collect the result later. The handle's type is
+<code>task&lt;T&gt;</code>, where <code>T</code> is the function's return type. <code>join</code> waits for it to finish and hands
+back the value:</p>
+<pre><code class="language-torvik">df slow_sum(from: i64, to: i64) -&gt; i64 {
+    set total: i64 = 0;
+    each n in from..+to { total += n; }
+    return total;
+}
+
+df main() -&gt; void {
+    set h: task&lt;i64&gt; = raven slow_sum(1, 1000000);
+
+    echo!("working on something else meanwhile...");
+
+    fixed result: i64 = join(h);      // wait, take the value
+    echo!("sum: {result}");
+}</code></pre>
+<p>Between the <code>raven</code> line and the <code>join</code> line, both things run at once. That gap is where the
+speedup lives — do as much other work there as you can.</p>
+<p>Run several at once and join them all:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    set a: task&lt;i64&gt; = raven slow_sum(1, 500000);
+    set b: task&lt;i64&gt; = raven slow_sum(500001, 1000000);
+
+    fixed total: i64 = join(a) + join(b);
+    echo!("total: {total}");
+}</code></pre>
+<p>Both tasks run in parallel; the joins collect them in turn.</p>
+<p>A few rules:</p>
+<ul>
+<li><code>join(h)</code> is an ordinary expression, so it composes: <code>check join(h) == "ok" { ... }</code>.</li>
+<li>A <code>task&lt;void&gt;</code> is joined as a <strong>statement</strong>: <code>join(h);</code> waits and yields nothing.</li>
+<li>Every handle may be joined <strong>exactly once</strong>. A second join is a clean panic — the result</li>
+</ul>
+<p>has already been taken.</p>
+<ul>
+<li>A bare <code>join(h);</code> on a value-returning task is fine: it waits and discards.</li>
+</ul>
+<p>Any crossable type can be a task result: every integer width, <code>f64</code>, <code>bool</code>, <code>str</code>,
+<code>i128</code>/<code>u128</code>, and <code>aett</code> values.</p>
+<h2>Arguments are copied at the spawn</h2>
+<p>When you write <code>raven greet(name)</code>, the argument is <strong>deep-copied at the moment the spawn
+runs</strong>, on your thread. After that line, the task owns its copy and you own yours:</p>
+<pre><code class="language-torvik">set name: str = "original";
+set h: task&lt;str&gt; = raven greet(name);
+
+name = "changed";               // the task already has its own copy
+echo!(join(h));                 // greeted "original", not "changed"</code></pre>
+<p>This is the whole reason the model needs no locks on ordinary values: only one thread can
+ever see a given string or box. It also removes a classic bug — the loop that spawns tasks,
+mutates a shared variable, and has every task see the last value.</p>
+<p>Collections (<code>list</code>, <code>table</code>, <code>bag</code>) and <code>result</code> values do <strong>not</strong> cross into a task in this
+version. Pass the scalars and strings a task needs and rebuild structure inside it. The one
+deliberate exception is a bridge, below, which is shared on purpose.</p>
+<h2>The self-contained rule</h2>
+<p>A raven carries everything it needs in its claws. <strong>A function that is ever spawned — and
+every function it transitively calls — may not read or write a global variable.</strong> The
+compiler checks this and names the spawn, the function, and the global:</p>
+<pre><code class="language-torvik">set counter: i64 = 0;
+
+df tick() -&gt; i64 { return counter; }    // reads a global
+
+df main() -&gt; void {
+    set h: task&lt;i64&gt; = raven tick();    // error: 'tick' is not self-contained
+    echo!(join(h));
+}</code></pre>
+<p>The reason is precise, and worth understanding. Even <em>reading</em> a global string from two
+threads races on its <strong>reference count</strong>, which isn't atomic. Torvik could make every
+refcount in the language atomic — and every single-threaded program would pay for it. Instead
+it requires tasks to be self-contained and keeps the runtime lock-free.</p>
+<p>The fix is always the same: pass what the task needs as an argument.</p>
+<pre><code class="language-torvik">df tick(start: i64) -&gt; i64 { return start + 1; }
+
+df main() -&gt; void {
+    fixed counter: i64 = 0;
+    set h: task&lt;i64&gt; = raven tick(counter);   // fine - it's an argument now
+    echo!(join(h));
+}</code></pre>
+<p>This rule can only loosen in future versions, never tighten — code that compiles today keeps
+compiling.</p>
+<h2>Panics in tasks</h2>
+<p>If a task panics — an out-of-bounds index, a failed <code>vow</code>, a <code>halt</code> — the <strong>whole process
+stops immediately</strong>, with the usual message, exactly as on the main thread. A background
+failure is never silently swallowed or deferred until you happen to join.</p>
+<p>For failure you want to <em>handle</em>, return a <code>result&lt;T&gt;</code> from the task and inspect it after
+joining, like anywhere else:</p>
+<pre><code class="language-torvik">df fetch(id: i64) -&gt; result&lt;str&gt; {
+    check id &lt; 0 { return err("bad id"); }
+    return ok(fmt("record-{id}"));
+}
+
+df main() -&gt; void {
+    set h: task&lt;result&lt;str&gt;&gt; = raven fetch(-1);
+    fixed r: result&lt;str&gt; = join(h);
+
+    check is_err(r) {
+        echo!("task failed: {err_msg(r)}");
+    } fallback {
+        echo!(unwrap(r));
+    }
+}</code></pre>
+<h2>Bridges: channels between tasks</h2>
+<p>Joining collects one value at the end. A <strong>bridge</strong> carries a stream of values while tasks
+are still running. It's a typed, buffered queue that several threads can use at once — the
+one object tasks share, with its own lock protecting its interior.</p>
+<pre><code class="language-torvik">set ch: bridge&lt;str&gt; = bridge_new(8);    // capacity 8 (must be &gt;= 1)
+
+send(ch, "hello");                       // copies the value in; blocks if full
+fixed msg: str = recv(ch);               // takes one out; blocks if empty</code></pre>
+<p>Values <strong>deep-copy on send</strong>, the same guarantee as spawn arguments: once a value crosses,
+sender and receiver own independent copies.</p>
+<p>The blocking behaviour is a feature. If the buffer is full, <code>send</code> waits — which throttles a
+fast producer to the speed of its consumer instead of growing memory without bound.</p>
+<p>A bridge passed <strong>into</strong> a task is the one argument that isn't copied: the task receives the
+bridge itself (a private copy of a channel would be pointless). That's what makes it the
+shared object, and why it carries its own lock.</p>
+<h2>Closing a bridge and the worker loop</h2>
+<p><code>bridge_close(ch)</code> says "no more values will be sent." It's idempotent and wakes anyone
+waiting.</p>
+<p>After a bridge is closed <em>and</em> emptied, <code>recv</code> panics — reading past the end of a finished
+stream is a mistake. To drain a stream to its natural end, use <code>try_recv</code>, which returns a
+<code>result&lt;T&gt;</code>: ok while data remains, and a single err once the bridge is closed and drained.
+That err is your stop signal:</p>
+<pre><code class="language-torvik">df produce(ch: bridge&lt;i64&gt;, n: i64) -&gt; void {
+    set i: i64 = 0;
+    whilst i &lt; n {
+        send(ch, i);
+        i += 1;
+    }
+    bridge_close(ch);                    // done producing
+}
+
+df main() -&gt; void {
+    set ch: bridge&lt;i64&gt; = bridge_new(4);
+
+    raven produce(ch, 10);               // producer on its own thread
+
+    set total: i64 = 0;
+    whilst true {
+        set r: result&lt;i64&gt; = try_recv(ch);
+        check is_err(r) { break; }       // closed and drained: stop cleanly
+        total += unwrap(r);
+    }
+
+    echo!("sum: {total}");               // 45
+}</code></pre>
+<p>That's the canonical worker loop, and it's worth memorising: <strong><code>try_recv</code> in a loop, break on
+err.</strong></p>
+<p><code>send</code> into a closed bridge panics — closing means you promised not to. Multiple producers
+and multiple consumers on one bridge are fully supported: the bridge's lock serialises them,
+and each value is received <strong>exactly once by exactly one consumer</strong>.</p>
+<h2>What crosses, and what waits</h2>
+<ul>
+<li><strong>Across a spawn or bridge:</strong> every integer width, <code>u64</code>, <code>f64</code>, <code>bool</code>, <code>str</code>,</li>
+</ul>
+<p><code>i128</code>/<code>u128</code>, and <code>aett</code> values. Collections and <code>result</code> don't cross yet.</p>
+<ul>
+<li><strong><code>bridge_new(cap)</code></strong> needs <code>cap &gt;= 1</code>; unbuffered rendezvous channels are a later</li>
+</ul>
+<p>addition, and a smaller capacity panics.</p>
+<ul>
+<li><strong>Ordering</strong> is whatever <code>join</code> and bridge blocking impose. There is no hidden ordering —</li>
+</ul>
+<p>and no sleeps are ever needed to make concurrent Torvik deterministic. Force the ordering
+you want by joining, or by the sequence of sends and receives.</p>
+<p>If you ever find yourself reaching for a sleep to "let a task finish," you want a <code>join</code> or a
+<code>recv</code> instead.</p>
+<h2>Putting it together</h2>
+<p>A pipeline: several workers process items and report through one bridge while the main thread
+collects.</p>
+<pre><code class="language-torvik">df worker(ch: bridge&lt;str&gt;, id: i64, count: i64) -&gt; void {
+    set i: i64 = 0;
+    whilst i &lt; count {
+        send(ch, fmt("worker {id} finished item {i}"));
+        i += 1;
+    }
+}
+
+df main() -&gt; void {
+    set ch: bridge&lt;str&gt; = bridge_new(16);
+
+    raven worker(ch, 1, 3);
+    raven worker(ch, 2, 3);
+
+    set received: i64 = 0;
+    whilst received &lt; 6 {                 // two workers, three items each
+        fixed msg: str = recv(ch);
+        echo!(msg);
+        received += 1;
+    }
+
+    bridge_close(ch);
+    echo!("all {received} items reported");
+}</code></pre>
+<p>Both workers run in parallel, their messages interleave in whatever order they finish, and
+every message arrives exactly once. No locks, no shared counters, no races — there was never
+any shared mutable state to protect.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Spawn two tasks computing sums over different ranges and join both.</li>
+<li>Spawn a task, then try to <code>join</code> it twice. Read the panic.</li>
+<li>Write a function that reads a global and try to spawn it. Read the error, then fix it by</li>
+</ol>
+<p>passing the value as an argument.</p>
+<ol>
+<li>Build a producer/consumer with <code>try_recv</code> and confirm it stops cleanly on close.</li>
+<li>Make a bridge with capacity 1 and a producer much faster than the consumer. Convince</li>
+</ol>
+<p>yourself the producer is being throttled.</p>
+<ol>
+<li>Spawn a task that calls <code>vow</code> with a false condition and watch the whole process stop.</li>
+<li>Run three workers into one bridge and count the total messages. Note that the <em>order</em></li>
+</ol>
+<p>varies between runs but the <em>count</em> never does.</p>
+<hr>
+<p><em><a href="/guide-errors">← 5. Errors and safety</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-projects">7. Modules and projects →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

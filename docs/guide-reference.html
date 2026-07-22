@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide - Reference - Torvik</title>
+  <meta name="description" content="Complete Torvik reference - every keyword and operator, the built-in function library, the memory model, and an honest list of what the language does not do yet.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide - Reference - Torvik">
+  <meta property="og:description" content="Complete Torvik reference - every keyword and operator, the built-in function library, the memory model, and an honest list of what the language does not do yet.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide - Reference - Torvik">
+  <meta name="twitter:description" content="Complete Torvik reference - every keyword and operator, the built-in function library, the memory model, and an honest list of what the language does not do yet.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Appendix: full reference</h1>
+<p><em><a href="/guide-projects">← 7. Modules and projects</a> · <a href="/guide">Guide index</a></em></p>
+<p>Everything in one place, for looking things up once you know the language.</p>
+<h2>Keywords</h2>
+<p>| Keyword | Purpose |
+|---|---|
+| <code>df</code> | Define a function |
+| <code>set</code> | Declare a mutable variable |
+| <code>fixed</code> | Declare an immutable variable |
+| <code>return</code> | Return from a function |
+| <code>check</code> | Conditional (<code>if</code>) |
+| <code>fallback</code> | Else branch of <code>check</code>, recovery block of <code>guard</code>, or default arm of <code>when</code> |
+| <code>guard</code> | Require a condition, else run a fallback (early exit) |
+| <code>whilst</code> | Condition loop (<code>while</code>) |
+| <code>each</code> | Range or list loop |
+| <code>in</code> | Separates the loop variable from its range in <code>each</code> |
+| <code>break</code> | Exit the current loop |
+| <code>continue</code> | Skip to the next loop iteration |
+| <code>aett</code> | Declare a family of named values (an enumeration) |
+| <code>when</code> | Pattern matching over an aett or integers |
+| <code>raven</code> | Spawn a <code>df</code> function as a concurrent task |
+| <code>task</code> | The type of a raven handle: <code>task&lt;T&gt;</code> |
+| <code>echo</code> | Print without a trailing newline |
+| <code>echo!</code> | Print with a trailing newline |
+| <code>vow</code> | Assertion: abort with a message if a condition is false |
+| <code>halt</code> | Print a message and exit immediately |
+| <code>unsafe</code> | Prefix a declaration/assignment to opt into a rejected operation |
+| <code>apply</code> | Bring another module's definitions into the file |
+| <code>true</code> / <code>false</code> | Boolean literals |</p>
+<h2>Operators</h2>
+<p>| Category | Operators | Notes |
+|---|---|---|
+| Arithmetic | <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code> | Prefix <code>-</code> negates |
+| Comparison | <code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> | Yield <code>bool</code>; strings compare by content |
+| Logical | <code>&amp;&amp;</code> <code>\|\|</code> <code>!</code> | Short-circuiting; usable as values |
+| Bitwise | <code>&amp;</code> <code>\|</code> <code>^</code> <code>~</code> <code>&lt;&lt;</code> <code>&gt;&gt;</code> | Integer types |
+| Assignment | <code>=</code> <code>+=</code> <code>-=</code> <code>*=</code> <code>/=</code> <code>%=</code> | Compound forms update in place |
+| Range | <code>..</code> <code>..+</code> | <code>..</code> exclusive, <code>..+</code> inclusive |
+| Ternary | <code>?&gt;</code> <code>!&gt;</code> | <code>cond ?&gt; a !&gt; b</code>; only the taken branch runs |
+| Weave | <code>~&gt;</code> | <code>x ~&gt; f ~&gt; g</code> is <code>g(f(x))</code> |
+| Membership | <code>&lt;\|</code> | <code>item &lt;\| collection</code> yields a <code>bool</code> |
+| Variant | <code>::</code> | <code>Status::Active</code> reads an aett variant |
+| When arm | <code>=&gt;</code> | <code>pattern =&gt; statement-or-block</code> |</p>
+<p>Arithmetic binds tighter than comparison, including with call and index operands:
+<code>a + f(x) &gt; b</code> reads as <code>(a + f(x)) &gt; b</code>. Use parentheses whenever they clarify.</p>
+<p><strong>Comparisons are fully chainable.</strong> Any value — variable, literal, call result, list
+element, <code>table_get</code>, or parenthesized expression — can sit on either side. Strings compare
+by content; <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> order them lexicographically. Comparing a string with a number
+is a clean compile error.</p>
+<p><strong>Boolean expressions are fully chainable (v1.4.0).</strong> <code>&amp;&amp;</code> and <code>||</code> work as values, chain any
+number of operands, and boolean-returning calls compare against literals:</p>
+<pre><code class="language-torvik">fixed ok: bool = a &amp;&amp; b;
+fixed all: bool = a &amp;&amp; b &amp;&amp; c;
+check contains(line, "error") == false { ... }</code></pre>
+<h2>Types</h2>
+<p>| Type | Description |
+|---|---|
+| <code>i8</code> <code>i16</code> <code>i32</code> <code>i64</code> | Signed integers |
+| <code>u8</code> <code>u16</code> <code>u32</code> <code>u64</code> | Unsigned integers |
+| <code>i128</code> <code>u128</code> | Wide integers (heap-backed) |
+| <code>f64</code> | 64-bit floating point |
+| <code>bool</code> | <code>true</code> or <code>false</code> |
+| <code>str</code> | Text |
+| <code>list&lt;T&gt;</code> | Ordered, growable sequence |
+| <code>table&lt;K, V&gt;</code> | Hash map |
+| <code>bag&lt;T&gt;</code> | Set/multiset |
+| <code>result&lt;T&gt;</code> | Success value or error |
+| <code>task&lt;T&gt;</code> | Handle to a spawned task |
+| <code>bridge&lt;T&gt;</code> | Typed channel between tasks |
+| <code>void</code> | No return value |</p>
+<h2>Built-in functions</h2>
+<p>Always available, no <code>apply</code> needed.</p>
+<h3>Strings</h3>
+<p>| Function | Returns | Description |
+|---|---|---|
+| <code>len(s)</code> | <code>i64</code> | Length (also works on lists) |
+| <code>str_concat(a, b, ...)</code> | <code>str</code> | Concatenate two or more strings |
+| <code>substr(s, start, end)</code> | <code>str</code> | Substring, <code>end</code> exclusive |
+| <code>char_at(s, i)</code> | <code>str</code> | Character at <code>i</code> as a 1-character string |
+| <code>byte_at(s, i)</code> | <code>i64</code> | Raw byte value at <code>i</code> |
+| <code>chr(code)</code> | <code>str</code> | 1-character string for a byte code |
+| <code>trim(s)</code> / <code>triml(s)</code> / <code>trimr(s)</code> | <code>str</code> | Remove whitespace (both / left / right) |
+| <code>upper(s)</code> / <code>lower(s)</code> | <code>str</code> | Case conversion |
+| <code>replace(s, old, new)</code> | <code>str</code> | Replace occurrences |
+| <code>contains(s, sub)</code> | <code>bool</code> | Whether <code>s</code> contains <code>sub</code> |
+| <code>find(s, sub)</code> | <code>i64</code> | Index of first occurrence, or <code>-1</code> |
+| <code>starts(s, prefix)</code> / <code>ends(s, suffix)</code> | <code>bool</code> | Prefix / suffix test |
+| <code>split(s, sep)</code> | <code>list&lt;str&gt;</code> | Split into pieces |
+| <code>fmt(template, ...)</code> | <code>str</code> | Build a string with interpolation |</p>
+<h3>Conversions</h3>
+<p>| Function | Returns |
+|---|---|
+| <code>toint(s)</code> | <code>i64</code> |
+| <code>tofloat(s)</code> | <code>f64</code> |
+| <code>tostr(x)</code> | <code>str</code> |
+| <code>try_toint(s)</code> | <code>result&lt;i64&gt;</code> |
+| <code>try_tofloat(s)</code> | <code>result&lt;f64&gt;</code> |
+| <code>typeof(x)</code> | <code>str</code> |</p>
+<h3>Lists</h3>
+<p><code>list_new()</code>, <code>push(xs, v)</code>, <code>xs[i]</code>, <code>len(xs)</code>, <code>list_insert(xs, i, v)</code>,
+<code>list_remove(xs, i)</code>, <code>list_pop(xs)</code></p>
+<h3>Tables</h3>
+<p><code>table_new()</code>, <code>table_set(t, k, v)</code>, <code>table_get(t, k)</code>, <code>table_has(t, k)</code>,
+<code>table_del(t, k)</code>, <code>table_len(t)</code>, <code>table_keys(t)</code> (sorted)</p>
+<h3>Bags</h3>
+<p><code>bag_new()</code>, <code>bag_add(b, v)</code>, <code>bag_has(b, v)</code>, <code>bag_remove(b, v)</code>, <code>bag_len(b)</code></p>
+<h3>Results</h3>
+<p><code>ok(v)</code>, <code>err(msg)</code>, <code>err(code, msg)</code>, <code>is_ok(r)</code>, <code>is_err(r)</code>, <code>unwrap(r)</code>,
+<code>unwrap_or(r, default)</code>, <code>err_msg(r)</code>, <code>err_code(r)</code></p>
+<h3>Files and system</h3>
+<p><code>readfile(p)</code>, <code>writefile(p, s)</code>, <code>appendfile(p, s)</code>, <code>fs_exists(p)</code>, <code>fs_size(p)</code>,
+<code>fs_mkdir(p)</code>, <code>fs_remove(p)</code>, <code>fs_copy(a, b)</code>, <code>fs_is_dir(p)</code>, <code>fs_mtime(p)</code>,
+<code>dir_list(p)</code>, <code>args()</code>, <code>args_get(i)</code>, <code>exit(code)</code>, <code>sleep(ms)</code></p>
+<p>Result-returning forms: <code>try_readfile</code>, <code>try_writefile</code>, <code>try_appendfile</code>, <code>try_fs_copy</code>.</p>
+<h3>Concurrency</h3>
+<p><code>raven f(...)</code>, <code>join(h)</code>, <code>bridge_new(cap)</code>, <code>send(ch, v)</code>, <code>recv(ch)</code>, <code>try_recv(ch)</code>,
+<code>bridge_close(ch)</code></p>
+<h2>The memory model</h2>
+<p>Torvik manages memory with <strong>automatic reference counting (ARC)</strong>. Heap values — strings,
+lists, tables, bags, 128-bit integers — carry a count of how many references point at them.
+When the last one goes away, the memory is released immediately.</p>
+<p>There is no garbage collector and no manual <code>free</code>.</p>
+<p>What that gives you:</p>
+<ul>
+<li><strong>Deterministic cleanup.</strong> Memory is released at a predictable point, not whenever a</li>
+</ul>
+<p>collector decides to run. No pauses.</p>
+<ul>
+<li><strong>Leak-free for supported patterns.</strong> Ordinary code that builds and discards strings and</li>
+</ul>
+<p>collections releases memory deterministically.</p>
+<ul>
+<li><strong>Clean out-of-memory behaviour.</strong> If an allocation can't be satisfied, the program panics</li>
+</ul>
+<p>cleanly rather than corrupting state.</p>
+<ul>
+<li><strong>No reference cycles.</strong> Reference counting can't reclaim cycles — but Torvik has no</li>
+</ul>
+<p>construct that can create one. (That would require nested mutable containers, which arrive
+in a later version alongside a cycle strategy.)</p>
+<ul>
+<li><strong>Lock-free across threads.</strong> Concurrency copies values as they cross thread boundaries, so</li>
+</ul>
+<p>ordinary refcounts never need atomics. The single exception is a bridge's own refcount — a
+bridge is deliberately shared, so that one count is atomic. Nothing else in the language is.</p>
+<p>You don't manage any of this. It's worth understanding because it explains the
+<a href="/guide-concurrency">self-contained rule</a> for tasks, and why Torvik has no GC pauses.</p>
+<h2>Compile warnings</h2>
+<p>| Category | Triggered by |
+|---|---|
+| <code>unused_variable</code> | A binding that's never read |
+| <code>unreachable_code</code> | A statement after <code>return</code>/<code>break</code>/<code>continue</code>/<code>halt</code>/<code>exit</code> |
+| <code>unused_result</code> | A bare statement call of a non-void function |
+| <code>deprecated</code> | A builtin scheduled for removal |</p>
+<p>Prefix a name with <code>_</code> to mark a discard as deliberate. Control from inside a file with
+<code>!@NO_WARN;</code> or <code>!@ALLOW[category];</code> at the top. Suppress from the command line with
+<code>torvc --no-warn</code>.</p>
+<h2>Compiler and project tools</h2>
+<pre><code>torvc file.tv -o output      compile
+torvc file.tv -o out --final optimized build (-O3, stripped)
+torvc --no-warn              suppress warnings
+torvc version                version info
+
+rune new &lt;name&gt;              create a project
+rune init                    make the current directory a project
+rune build                   build to build/&lt;name&gt;
+rune build --final           optimized release build
+rune run                     build and run
+rune list                    project info
+rune clean                   remove build/
+rune version                 rune, language, and std versions
+rune update [vX]             update Torvik and rune (optionally pinned)
+rune self-update             update just rune
+rune uninstall               remove the toolchain</code></pre>
+<h2>What Torvik does not do yet</h2>
+<p>An honest list. Every one of these is a clean compile error or a documented narrow case —
+never a silent wrong answer.</p>
+<p><strong>Not in the language yet:</strong></p>
+<ul>
+<li><strong>Structs (<code>shape</code>)</strong> — grouping named fields into one value.</li>
+<li><strong>A <code>pub</code> visibility keyword.</strong></li>
+<li><strong><code>f32</code></strong> and a dedicated <strong><code>char</code></strong> type (character literals are one-character strings</li>
+</ul>
+<p>today).</p>
+<ul>
+<li><strong>Fixed-size arrays</strong> (<code>[T; N]</code>).</li>
+<li><strong>Systems/OS primitives</strong> — inline assembly, volatile access, raw pointer operations,</li>
+</ul>
+<p>packed structs. Torvik is a general-purpose compiled language; these are out of scope.</p>
+<p><strong>Narrow cases:</strong></p>
+<ul>
+<li>A conversion result used directly inside a larger arithmetic expression needs binding</li>
+</ul>
+<p>first: write <code>set n: i64 = toint("7"); echo!(n + 1);</code>.</p>
+<ul>
+<li>Collections and <code>result</code> values don't cross a spawn or a bridge yet — pass scalars and</li>
+</ul>
+<p>strings and rebuild structure inside the task.</p>
+<ul>
+<li><code>bridge_new</code> needs a capacity of at least 1; there are no unbuffered rendezvous channels.</li>
+<li>There's no <code>select</code> over multiple bridges.</li>
+</ul>
+<p><strong>Platforms:</strong> Linux and Windows (x86-64). macOS is planned once Apple hardware is available
+for credible testing.</p>
+<h2>Where to go next</h2>
+<p>You've been through the whole language. The most useful next step is to build something —
+a tool you'd actually use. A line counter, a log filter, a small static site generator, a
+localhost API.</p>
+<ul>
+<li><a href="/rune">Rune</a> — the project and toolchain manager in detail</li>
+<li><a href="/vefna">Vefna</a> — a static site generator written entirely in Torvik, and a substantial</li>
+</ul>
+<p>real-world Torvik program to read</p>
+<ul>
+<li><a href="/releases">Releases</a> — downloads and changelogs</li>
+<li><a href="/contributing">Contributing</a> — how to help</li>
+<li><a href="/contact">Contact</a> — questions and feedback</li>
+</ul>
+<hr>
+<p><em><a href="/guide-projects">← 7. Modules and projects</a> · <a href="/guide">Guide index</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

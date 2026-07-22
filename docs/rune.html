@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rune - Torvik</title>
+  <meta name="description" content="rune - the package manager and toolchain manager for Torvik. Create, build, and run projects, and keep your installation up to date.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Rune - Torvik">
+  <meta property="og:description" content="rune - the package manager and toolchain manager for Torvik. Create, build, and run projects, and keep your installation up to date.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Rune - Torvik">
+  <meta name="twitter:description" content="rune - the package manager and toolchain manager for Torvik. Create, build, and run projects, and keep your installation up to date.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Rune</h1>
+<p><strong>The project and toolchain manager for Torvik.</strong> rune creates projects, builds and
+runs them, and keeps your Torvik installation up to date. rune is itself written in
+Torvik.</p>
+<p>As of v1.4.0, rune lives in its own repository and is versioned and released
+independently of Torvik, so it can ship fixes and features on its own cadence. It still
+installs into the same place (<code>~/.torvik</code>) and manages Torvik exactly as before.</p>
+<h2>Install</h2>
+<p>You normally get rune automatically when you install Torvik:</p>
+<p>Linux:</p>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
+<p>Windows (PowerShell):</p>
+<pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></pre>
+<p>The Torvik installer pulls the latest rune for you. To install or reinstall <strong>only</strong>
+rune:</p>
+<p>Linux:</p>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/rune/main/linux/install.sh | sh</code></pre>
+<p>Windows (PowerShell):</p>
+<pre><code>iwr -useb https://raw.githubusercontent.com/torvik-lang/rune/main/windows/install.ps1 | iex</code></pre>
+<h2>Commands</h2>
+<pre><code>rune new &lt;name&gt;     Create a new project directory
+rune init           Initialize a project in the current directory
+rune build          Build the current project
+rune run            Build and run the current project
+rune update [vX]    Update Torvik (torvc + std) and rune to the latest, or pin torvc to vX
+rune self-update    Update just rune, from its own repo
+rune uninstall      Remove the Torvik toolchain and rune (~/.torvik)
+rune version        Show the rune, language, and std versions</code></pre>
+<p>A project is a <code>torvik.rune</code> manifest plus a <code>src/main.tv</code> entry point. The manifest can
+declare a <strong>minimum Torvik version</strong> (and a minimum <code>std</code> version); <code>rune build</code> / <code>run</code>
+refuses to build with an older toolchain and points you at <code>rune update</code>.</p>
+<h2>Updating</h2>
+<pre><code>rune update            # latest Torvik + rune
+rune update v1.4       # pin: the newest 1.4.x toolchain
+rune self-update       # just rune</code></pre>
+<p><code>rune update</code> checks Torvik and rune <strong>independently</strong>: if only Torvik moved it updates
+the toolchain (which also refreshes rune), if only rune moved it updates just rune, and if
+both moved it updates both. Each update fetches the release, verifies it, and swaps it in
+place.</p>
+<h2>Uninstall</h2>
+<pre><code>rune uninstall         # removes ~/.torvik (toolchain + rune)</code></pre>
+<p>rune follows semantic versioning on its own line, independent of Torvik's, and is
+distributed as a prebuilt binary through the installers and the
+<a href="https://github.com/torvik-lang/rune/releases">releases page</a> — there's nothing to
+compile.</p>
+<h2>Learn more</h2>
+<ul>
+<li><a href="https://github.com/torvik-lang/rune">rune repository</a> - source, releases, and changelog</li>
+<li><a href="https://github.com/torvik-lang/torvik/blob/main/docs/TOOLING.md">Tooling guide</a> - <code>torvc</code> and <code>rune</code> in depth</li>
+<li><a href="/">Back to Torvik</a></li>
+</ul>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

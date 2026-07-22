@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide 4 - Collections and text - Torvik</title>
+  <meta name="description" content="Store many values with lists, tables, and bags, test membership, and work with strings using Torvik's full set of text builtins.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Guide 4 - Collections and text - Torvik">
+  <meta property="og:description" content="Store many values with lists, tables, and bags, test membership, and work with strings using Torvik's full set of text builtins.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Guide 4 - Collections and text - Torvik">
+  <meta name="twitter:description" content="Store many values with lists, tables, and bags, test membership, and work with strings using Torvik's full set of text builtins.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>4. Collections and text</h1>
+<p><em><a href="/guide-functions">← 3. Functions</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-errors">5. Errors and safety →</a></em></p>
+<p>So far every variable has held <strong>one</strong> value. Real programs handle many at once — a list of
+users, a count per word, a set of things already seen. Torvik has three collections for this,
+plus a full set of text operations.</p>
+<h2>Lists: <code>list&lt;T&gt;</code></h2>
+<p>A <strong>list</strong> is an ordered, growable sequence. The <code>&lt;T&gt;</code> says what it holds: <code>list&lt;i64&gt;</code> is a
+list of integers, <code>list&lt;str&gt;</code> a list of strings.</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    set xs: list&lt;i64&gt; = list_new();
+
+    push(xs, 10);
+    push(xs, 20);
+    push(xs, 30);
+
+    echo!(xs[0]);        // 10 - first element
+    echo!(xs[2]);        // 30 - third element
+    echo!(len(xs));      // 3
+}</code></pre>
+<ul>
+<li><code>list_new()</code> creates an empty list.</li>
+<li><code>push(list, value)</code> appends to the end.</li>
+<li><code>list[i]</code> reads the element at index <code>i</code> — <strong>counting from 0</strong>.</li>
+<li><code>len(list)</code> gives the number of elements.</li>
+</ul>
+<p>A list of three items has indexes 0, 1, and 2. Index 3 is past the end, and reading it stops
+the program with a clear out-of-bounds message rather than handing back garbage.</p>
+<h3>Modifying a list</h3>
+<pre><code class="language-torvik">set xs: list&lt;i64&gt; = list_new();
+push(xs, 10); push(xs, 20); push(xs, 30);
+
+list_insert(xs, 1, 15);            // insert 15 at index 1 -&gt; [10, 15, 20, 30]
+list_remove(xs, 0);                // remove index 0       -&gt; [15, 20, 30]
+fixed last: i64 = list_pop(xs);    // remove and return the last -&gt; 30
+
+xs[0] = 99;                        // assign to an existing index</code></pre>
+<h3>Walking a list</h3>
+<p>Iterate directly with <code>each</code> — the clearest form:</p>
+<pre><code class="language-torvik">set words: list&lt;str&gt; = list_new();
+push(words, "for"); push(words, "the"); push(words, "horde");
+
+each w in words {
+    echo!(w);
+}</code></pre>
+<p>When you need the index too, range over the length:</p>
+<pre><code class="language-torvik">each i in 0..len(xs) {
+    echo!("{i}: {xs[i]}");
+}</code></pre>
+<p><code>0..len(xs)</code> is exactly right: exclusive at the end, so it covers 0 through the last valid
+index and never runs off.</p>
+<p>Accumulating is the other everyday pattern:</p>
+<pre><code class="language-torvik">set total: i64 = 0;
+each v in xs {
+    total += v;
+}
+echo!("sum: {total}");</code></pre>
+<h3>Element types and inference</h3>
+<p>Lists hold any element type — <code>list&lt;str&gt;</code>, <code>list&lt;f64&gt;</code>, <code>list&lt;bool&gt;</code>, <code>list&lt;i128&gt;</code>. The type
+usually comes from the annotation, but Torvik can also <strong>infer</strong> it from the first <code>push</code>:</p>
+<pre><code class="language-torvik">set names = list_new();      // element type not stated...
+push(names, "odin");         // ...inferred as str from this push
+echo!(names[0]);             // odin</code></pre>
+<p>Inference covers <code>str</code>, integer, <code>f64</code>, and <code>bool</code> elements. Annotate when there's no visible
+<code>push</code>, or for other element types. Writing the annotation is never wrong, and it documents
+intent — prefer it in code others will read.</p>
+<h2>Tables: <code>table&lt;K, V&gt;</code></h2>
+<p>A <strong>table</strong> maps keys to values — a phone book rather than a numbered row of lockers. Look
+things up by name instead of position.</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    set ages: table&lt;str, i64&gt; = table_new();
+
+    table_set(ages, "Ivar", 30);
+    table_set(ages, "Freya", 27);
+
+    echo!(table_get(ages, "Ivar"));    // 30
+    echo!(table_has(ages, "Ivar"));    // true
+    echo!(table_len(ages));            // 2
+
+    table_del(ages, "Ivar");
+    echo!(table_has(ages, "Ivar"));    // false
+}</code></pre>
+<p>Looking up a missing key returns a <strong>zero value</strong> — <code>0</code> for an integer table. Use
+<code>table_has</code> when "absent" and "zero" mean different things:</p>
+<pre><code class="language-torvik">check table_has(scores, name) {
+    echo!("{name}: {table_get(scores, name)}");
+} fallback {
+    echo!("{name} has no score yet");
+}</code></pre>
+<p>Setting a key that already exists replaces its value, so tables also work as counters:</p>
+<pre><code class="language-torvik">df count_words(words: list&lt;str&gt;) -&gt; table&lt;str, i64&gt; {
+    set counts: table&lt;str, i64&gt; = table_new();
+    each w in words {
+        set current: i64 = table_get(counts, w);   // 0 if absent
+        table_set(counts, w, current + 1);
+    }
+    return counts;
+}</code></pre>
+<h3>Iterating a table</h3>
+<p>Take the keys with <code>table_keys</code>, which returns them as a <strong>sorted</strong> <code>list&lt;str&gt;</code>, then fetch
+each value:</p>
+<pre><code class="language-torvik">fixed ks: list&lt;str&gt; = table_keys(ages);
+each k in ks {
+    echo!("{k} is {table_get(ages, k)}");
+}</code></pre>
+<p>They're sorted deliberately: a hash table's internal order shifts as it grows, so iterating
+raw storage would give you a different order run to run. Sorted keys mean <strong>reproducible
+output</strong> — the same input produces the same report every time.</p>
+<h2>Bags: <code>bag&lt;T&gt;</code></h2>
+<p>A <strong>bag</strong> is a set-like collection for membership questions — "have I seen this before?"</p>
+<pre><code class="language-torvik">set seen: bag&lt;str&gt; = bag_new();
+
+bag_add(seen, "rune");
+bag_add(seen, "rune");           // adding again is harmless
+
+echo!(bag_has(seen, "rune"));    // true
+echo!(bag_len(seen));            // 1
+
+bag_remove(seen, "rune");</code></pre>
+<p>Reach for a bag when you only care about presence:</p>
+<pre><code class="language-torvik">df first_repeat(words: list&lt;str&gt;) -&gt; str {
+    set seen: bag&lt;str&gt; = bag_new();
+    each w in words {
+        check bag_has(seen, w) { return w; }
+        bag_add(seen, w);
+    }
+    return "";
+}</code></pre>
+<h3>Choosing a collection</h3>
+<p>| Question | Use |
+|---|---|
+| Order matters, or I need position | <code>list&lt;T&gt;</code> |
+| I look things up by a key | <code>table&lt;K, V&gt;</code> |
+| I only ask "is it in there?" | <code>bag&lt;T&gt;</code> |</p>
+<h2>Membership: <code>&lt;|</code></h2>
+<p>The membership operator tests whether a value is in a collection, giving a <code>bool</code>:</p>
+<pre><code class="language-torvik">set ids: list&lt;i64&gt; = list_new();
+push(ids, 10); push(ids, 20); push(ids, 30);
+
+check 20 &lt;| ids {
+    echo!("present");
+}
+
+fixed known: bool = name &lt;| valid_names;</code></pre>
+<p>Anything can go on the left — a variable, a literal, or a call result. Integer lists compare
+by value and <strong>string lists compare by content</strong>, so a freshly built string matches an equal
+stored one. A type mismatch between the item and the list's elements is a compile error.</p>
+<p>For a large collection checked repeatedly, a <code>bag</code> is faster than scanning a list; <code>&lt;|</code> on a
+list examines elements in turn.</p>
+<h2>Working with text</h2>
+<p>Strings get their own toolkit. Every one of these returns a <strong>new</strong> string — Torvik strings
+are values, and operations never modify in place.</p>
+<h3>Length and pieces</h3>
+<pre><code class="language-torvik">echo!(len("hello"));               // 5
+echo!(substr("hello", 0, 4));      // "hell" - start..end, end exclusive
+echo!(char_at("hello", 1));        // "e"
+echo!(byte_at("hello", 1));        // 101
+echo!(chr(65));                    // "A"</code></pre>
+<p><code>substr(s, start, end)</code> takes from <code>start</code> <strong>up to but not including</strong> <code>end</code> — the same
+convention as ranges and indexes, so lengths line up: <code>substr(s, 0, 4)</code> gives four
+characters.</p>
+<h3>Joining</h3>
+<pre><code class="language-torvik">echo!(str_concat("Hello, ", "Torvik"));         // Hello, Torvik
+echo!(str_concat(key, " = ", value, "\n"));     // any number of parts</code></pre>
+<p><code>str_concat</code> takes two or more arguments (one is a compile error), so you never need to nest
+it. For anything with values interleaved, <code>fmt</code> usually reads better:</p>
+<pre><code class="language-torvik">fixed line: str = fmt("{key} = {value}");</code></pre>
+<h3>Trimming and case</h3>
+<pre><code class="language-torvik">echo!(trim("  hi  "));     // "hi"
+echo!(triml("  hi  "));    // "hi  " - left only
+echo!(trimr("  hi  "));    // "  hi" - right only
+echo!(upper("hi"));        // "HI"
+echo!(lower("HI"));        // "hi"</code></pre>
+<p><code>trim</code> on user input is almost always right — a trailing space is invisible and breaks
+comparisons.</p>
+<h3>Searching and testing</h3>
+<pre><code class="language-torvik">echo!(contains("hello", "ell"));    // true
+echo!(starts("hello", "he"));       // true
+echo!(ends("hello", "lo"));         // true
+echo!(find("hello", "l"));          // 2 - first index, or -1 if absent</code></pre>
+<p>Since v1.4.0 these compare directly against a literal:</p>
+<pre><code class="language-torvik">check contains(line, "error") == false {
+    echo!("clean line");
+}</code></pre>
+<h3>Replacing and splitting</h3>
+<pre><code class="language-torvik">echo!(replace("a.b.c", ".", "/"));            // a/b/c
+
+set parts: list&lt;str&gt; = split("x,y,z", ",");   // ["x", "y", "z"]
+each p in parts { echo!(p); }</code></pre>
+<p><code>split</code> is how you parse almost anything line-oriented: split a file on <code>"\n"</code>, split each
+line on <code>","</code> or <code>"\t"</code>, and work with the pieces.</p>
+<h3>Comparing strings</h3>
+<p>Strings compare <strong>by content</strong>, never by identity:</p>
+<pre><code class="language-torvik">check name == "Astrid" { echo!("match"); }
+check "apple" &lt; "banana" { echo!("sorted"); }     // lexicographic</code></pre>
+<p><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> order strings lexicographically (byte order), which is what you want for
+sorting. Comparing a string with a number is a clean compile error — convert first.</p>
+<h3>Converting</h3>
+<pre><code class="language-torvik">fixed n: i64 = toint("42");
+fixed f: f64 = tofloat("3.14");
+fixed s: str = tostr(42);</code></pre>
+<p>One practical note: bind a conversion result to a variable before using it in a larger
+arithmetic expression.</p>
+<pre><code class="language-torvik">set n: i64 = toint("7");
+echo!(n + 1);              // 8
+
+// echo!(toint("7") + 1);  // compile error - bind it first</code></pre>
+<p>It's a clean compile error, never a wrong answer. And if the text might not be a valid
+number, use <code>try_toint</code> instead, which reports failure properly — that's
+<a href="/guide-errors">the next chapter</a>.</p>
+<h2>Putting it together</h2>
+<p>A word-frequency report using all three collections:</p>
+<pre><code class="language-torvik">df main() -&gt; void {
+    fixed text: str = "the raven flew over the hall and the raven landed";
+
+    fixed words: list&lt;str&gt; = split(text, " ");
+
+    set counts: table&lt;str, i64&gt; = table_new();
+    set seen: bag&lt;str&gt; = bag_new();
+    set repeats: list&lt;str&gt; = list_new();
+
+    each w in words {
+        fixed clean: str = w ~&gt; trim ~&gt; lower;
+
+        set current: i64 = table_get(counts, clean);
+        table_set(counts, clean, current + 1);
+
+        check bag_has(seen, clean) {
+            check clean &lt;| repeats {
+                // already recorded
+            } fallback {
+                push(repeats, clean);
+            }
+        } fallback {
+            bag_add(seen, clean);
+        }
+    }
+
+    echo!("{len(words)} words, {table_len(counts)} unique");
+    echo!("");
+
+    fixed ks: list&lt;str&gt; = table_keys(counts);
+    each k in ks {
+        echo!("  {k}: {table_get(counts, k)}");
+    }
+
+    echo!("");
+    echo!("repeated words:");
+    each r in repeats {
+        echo!("  {r}");
+    }
+}</code></pre>
+<p>Because <code>table_keys</code> sorts, that report is identical every run.</p>
+<h2>Things to try</h2>
+<ol>
+<li>Build a <code>list&lt;i64&gt;</code> of ten numbers and print the largest, the smallest, and the average.</li>
+<li>Reverse a list into a new list. Then reverse a <strong>string</strong> using <code>char_at</code> and</li>
+</ol>
+<p><code>str_concat</code>.</p>
+<ol>
+<li>Count the vowels in a sentence using a <code>bag&lt;str&gt;</code> of vowels and <code>&lt;|</code> or <code>bag_has</code>.</li>
+<li>Build a <code>table&lt;str, str&gt;</code> phone book, then print it sorted by name.</li>
+<li>Split a CSV line like <code>"name,age,city"</code> and print each field on its own line, numbered.</li>
+<li>Write <code>is_palindrome(s: str) -&gt; bool</code> that ignores case and spaces.</li>
+<li>Take the word-frequency program and make it print only words appearing more than once.</li>
+</ol>
+<hr>
+<p><em><a href="/guide-functions">← 3. Functions</a> · <a href="/guide">Guide index</a> · Next: <a href="/guide-errors">5. Errors and safety →</a></em></p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>

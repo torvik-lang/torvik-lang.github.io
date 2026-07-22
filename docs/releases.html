@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Releases - Torvik</title>
+  <meta name="description" content="Download Torvik, rune, and Vefna - current versions, source and binaries, and what's new in each latest release.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Torvik">
+  <meta property="og:title" content="Releases - Torvik">
+  <meta property="og:description" content="Download Torvik, rune, and Vefna - current versions, source and binaries, and what's new in each latest release.">
+  <meta property="og:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@Torviklang">
+  <meta name="twitter:title" content="Releases - Torvik">
+  <meta name="twitter:description" content="Download Torvik, rune, and Vefna - current versions, source and binaries, and what's new in each latest release.">
+  <meta name="twitter:image" content="https://torvik-lang.github.io/static/img/torvik-mark.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16.png">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <img src="static/img/torvik-mark.png" alt="" width="38" height="38">
+      <span>Torvik</span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/guide">Guide</a>
+      <a href="/tour">Tour</a>
+      <a href="/rune">Rune</a>
+      <a href="/vefna">Vefna</a>
+      <a href="/releases">Releases</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+    </nav>
+  </header>
+  <main>
+
+<h1>Releases</h1>
+<p>Current releases of each project. Source archives download straight from GitHub; the
+<strong>binaries &amp; installers</strong> link opens the full GitHub release, where the platform builds
+and other assets live. The one-line installers below are the recommended way to get set
+up on Linux or Windows.</p>
+<hr>
+<h2>Torvik — v1.4.0</h2>
+<p>The language and compiler.</p>
+<p><strong>Install</strong> &amp;nbsp;
+Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code>
+Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></p>
+<p><strong>Download</strong> &amp;nbsp;
+Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.4.0/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.4.0/torvc-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.4.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.4.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.4.0">all assets</a></p>
+<p><strong>What's new</strong></p>
+<ul>
+<li>Optional (<code>^</code>) and variadic (<code>*</code>) function parameters, with call-site type checking</li>
+<li>Boolean chaining is limit-free — <code>&amp;&amp;</code> / <code>||</code> as values, <code>contains(...) == false</code>, and more</li>
+<li><code>std::net</code> — an opt-in HTTP layer with binary-safe file serving</li>
+<li><code>chr</code> and <code>fs_size</code> builtins; standard library v1.3.0</li>
+<li><code>rune</code> decoupled into its own repository, versioned independently</li>
+<li>Fixes: exhaustive <code>when</code> false positive, boolean-literal argument IR, <code>bool</code> returns,</li>
+</ul>
+<p>single-character function names</p>
+<p><a href="https://github.com/torvik-lang/torvik/releases">All Torvik releases &amp;rarr;</a></p>
+<hr>
+<h2>rune — v1.4.0</h2>
+<p>The project and toolchain manager. Normally installed with Torvik; see the
+<a href="/rune">rune page</a> for the full command set.</p>
+<p><strong>Install (rune only)</strong> &amp;nbsp;
+Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/rune/main/linux/install.sh | sh</code>
+Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/rune/main/windows/install.ps1 | iex</code></p>
+<p><strong>Download</strong> &amp;nbsp;
+Binary: <a href="https://github.com/torvik-lang/rune/releases/download/v1.4.0/rune-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/download/v1.4.0/rune-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.4.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.4.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/tag/v1.4.0">all assets</a></p>
+<p><strong>What's new</strong></p>
+<ul>
+<li>rune now lives in its own repository and versions independently of Torvik</li>
+<li><code>rune update</code> checks Torvik and rune separately and updates whichever moved</li>
+<li><code>rune self-update</code> updates just rune</li>
+</ul>
+<blockquote><p><strong>v1.4.0 is rune's first release in its own repository.</strong> Earlier rune versions
+(v1.3.0 and before) shipped as part of Torvik — find those binaries under the matching
+<a href="https://github.com/torvik-lang/torvik/releases">Torvik release assets</a>. If you're on an
+older Torvik, you already have the rune that came with it; <code>rune update</code> moves you to the
+latest of both.</p></blockquote>
+<p><a href="https://github.com/torvik-lang/rune/releases">All rune releases &amp;rarr;</a></p>
+<hr>
+<h2>Vefna — v1.1.0</h2>
+<p>The static site generator woven in Torvik.</p>
+<p><strong>Install</strong> &amp;nbsp;
+Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/vefna/main/linux/install.sh | sh</code>
+Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/vefna/main/windows/install.ps1 | iex</code></p>
+<p><strong>Download</strong> &amp;nbsp;
+Binary: <a href="https://github.com/torvik-lang/vefna/releases/download/v1.1.0/vefna-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/vefna/releases/download/v1.1.0/vefna-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/vefna/archive/refs/tags/v1.1.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/vefna/archive/refs/tags/v1.1.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/vefna/releases/tag/v1.1.0">all assets</a></p>
+<p><strong>What's new</strong></p>
+<ul>
+<li><code>vefna serve [port]</code> — a built-in preview server with rebuild-on-change</li>
+<li><code>vefna watch</code> / <code>vefna build --watch</code> — rebuild continuously as sources change</li>
+<li><code>--drafts</code> — <code>draft: true</code> pages are skipped unless you ask for them</li>
+<li>Built with Torvik v1.4.0</li>
+</ul>
+<p><a href="https://github.com/torvik-lang/vefna/releases">All Vefna releases &amp;rarr;</a></p>
+<hr>
+<p>Looking for older versions or full changelogs? Every project's <strong>releases</strong> page lists
+each version with its notes and downloads.</p>
+  </main>
+  <footer>
+    <nav class="footer-links">
+      <a href="/guide">Guide</a>
+      <a href="/contributing">Contributing</a>
+      <a href="/contact">Contact</a>
+      <a href="https://github.com/torvik-lang/torvik/wiki">Wiki</a>
+      <a href="https://github.com/torvik-lang/torvik">GitHub</a>
+      <a href="https://x.com/Torviklang">X</a>
+      <a href="https://instagram.com/torviklang">Instagram</a>
+    </nav>
+    <p>Torvik &middot; AGPL-3.0 &middot; woven with <a href="https://github.com/torvik-lang/vefna">Vefna</a>, a static site generator written in Torvik</p>
+    <p class="copyright">&copy; 2026 torvik-lang &middot; All rights reserved</p>
+  </footer>
+</body>
+</html>
