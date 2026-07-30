@@ -5,7 +5,7 @@ description: Split code across files with apply, use the Torvik standard library
 
 # 7. Modules, the standard library, and real projects
 
-*[← 6. Concurrency](/guide-concurrency) · [Guide index](/guide) · Next: [Appendix: reference →](/guide-reference)*
+*[← 6. Concurrency](/guide-concurrency) · [Guide index](/guide) · Next: [8. Systems and OS development →](/guide-systems)*
 
 Everything so far has lived in one file compiled by hand. Real projects outgrow both. This
 chapter covers splitting code across files, the library that ships with Torvik, and the
@@ -66,7 +66,7 @@ apply std::net;
 ```
 
 The library is versioned **independently of the compiler** — it's currently 1.3.0 while the
-compiler is 1.4.0. That's deliberate: a future breaking change can be gated behind a new
+compiler is 1.5.0. That's deliberate: a breaking change can be gated behind a new
 major library version you opt into in your project manifest, rather than being forced on you
 by a compiler upgrade.
 
@@ -130,7 +130,7 @@ echo!(to_bin(5));         // 101
 
 ### `std::net` — a small HTTP layer
 
-New in Torvik v1.4.0. `std::net` gives you enough to serve a static site or a small
+`std::net` gives you enough to serve a static site or a small
 localhost API. Its transport primitives are provided by the compiler and runtime and
 **dead-strip out of programs that never call them**, so you pay nothing unless you use it.
 
@@ -215,7 +215,7 @@ name        = "myproject"
 version     = "0.1.0"
 description = "What this project does"
 author      = "Your Name"
-torvik      = "1.4.0"
+torvik      = "1.5.0"
 std         = "1.3.0"
 
 [runes]
@@ -249,7 +249,7 @@ rune self-update    # update just rune
 rune uninstall      # remove the toolchain
 ```
 
-`rune update` pins too: `rune update v1.4` takes the newest 1.4.x.
+`rune update` pins too: `rune update v1.5` takes the newest 1.5.x. Updates stay inside your current major — a new major is reported, not installed, until you opt in with `rune update v2 --yes`.
 
 ### A project layout that scales
 
@@ -398,4 +398,4 @@ platform with nothing installed.
 
 ---
 
-*[← 6. Concurrency](/guide-concurrency) · [Guide index](/guide) · Next: [Appendix: reference →](/guide-reference)*
+*[← 6. Concurrency](/guide-concurrency) · [Guide index](/guide) · Next: [8. Systems and OS development →](/guide-systems)*

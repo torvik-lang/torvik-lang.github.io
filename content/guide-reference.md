@@ -5,7 +5,7 @@ description: Complete Torvik reference - every keyword and operator, the built-i
 
 # Appendix: full reference
 
-*[← 7. Modules and projects](/guide-projects) · [Guide index](/guide)*
+*[← 8. Systems and OS development](/guide-systems) · [Guide index](/guide)*
 
 Everything in one place, for looking things up once you know the language.
 
@@ -61,7 +61,7 @@ element, `table_get`, or parenthesized expression — can sit on either side. St
 by content; `<` `<=` `>` `>=` order them lexicographically. Comparing a string with a number
 is a clean compile error.
 
-**Boolean expressions are fully chainable (v1.4.0).** `&&` and `||` work as values, chain any
+**Boolean expressions short-circuit (v1.5.0)** — the right-hand side is not evaluated when the left already decides the answer, so `i < len(xs) && xs[i] == 1` is a safe guard. They are also fully chainable: `&&` and `||` work as values, chain any
 number of operands, and boolean-returning calls compare against literals:
 
 ```torvik
@@ -256,4 +256,4 @@ localhost API.
 
 ---
 
-*[← 7. Modules and projects](/guide-projects) · [Guide index](/guide)*
+*[← 8. Systems and OS development](/guide-systems) · [Guide index](/guide)*

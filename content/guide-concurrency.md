@@ -77,7 +77,8 @@ A few rules:
   has already been taken.
 - A bare `join(h);` on a value-returning task is fine: it waits and discards.
 
-Any crossable type can be a task result: every integer width, `f64`, `bool`, `str`,
+Any crossable type can be a task result: every integer width, all four float widths
+(`f16`, `f32`, `f64`, `f128`), `bool`, `str`,
 `i128`/`u128`, and `aett` values.
 
 ## Arguments are copied at the spawn
@@ -233,7 +234,8 @@ and each value is received **exactly once by exactly one consumer**.
 
 ## What crosses, and what waits
 
-- **Across a spawn or bridge:** every integer width, `u64`, `f64`, `bool`, `str`,
+- **Across a spawn or bridge:** every integer width, all four float widths
+  (`f16`, `f32`, `f64`, `f128`), `bool`, `str`,
   `i128`/`u128`, and `aett` values. Collections and `result` don't cross yet.
 - **`bridge_new(cap)`** needs `cap >= 1`; unbuffered rendezvous channels are a later
   addition, and a smaller capacity panics.

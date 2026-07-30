@@ -45,7 +45,7 @@ rune run
 
 ```
 rune update            # update to the latest release
-rune update v1.4       # or pin: the newest 1.4.x release
+rune update v1.5       # or pin: the newest 1.5.x release
 rune version           # see what you're running
 ```
 
@@ -67,11 +67,19 @@ rune version           # see what you're running
   every argument type-checked at the call site so a mismatch is a clean error, not a crash.
 - **Networking, opt-in** - `apply std::net;` adds a small HTTP layer with binary-safe file
   serving; the transport primitives dead-strip out of programs that never use them.
-- **A small, sharp type system** - integer widths `i8` through `u128`, `f64`, `bool`,
+- **Systems and OS development** - raw pointers, `shape` value structs, volatile memory,
+  inline assembly, and freestanding builds that boot on bare hardware. Every one is
+  `unsafe`-gated and opt-in, so the safe surface stays safe.
+  [Build a kernel &rarr;](/guide-systems)
+- **A small, sharp type system** - integer widths `i8` through `u128`, floats `f16` through
+  `f128`, `bool`,
   `str`, the `list`, `table`, and `bag` collections, `result` for explicit error
   handling, and `aett` enumerations with exhaustiveness-checked `when` matching.
 - **Clean errors** - located, plain-language compile errors, plus a warnings system
   that found dead code in the compiler's own source the first time it ran.
+- **Five-year support on every major version** - three years active, one of maintenance,
+  one of security fixes. `rune` keeps you on your current major and tells you when a new
+  one lands rather than moving you. [Support policy &rarr;](/releases)
 
 ## A taste
 

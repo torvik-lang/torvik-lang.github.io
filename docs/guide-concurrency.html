@@ -29,6 +29,7 @@
       <a href="/">Home</a>
       <a href="/guide">Guide</a>
       <a href="/tour">Tour</a>
+      <a href="/std">Std</a>
       <a href="/rune">Rune</a>
       <a href="/vefna">Vefna</a>
       <a href="/releases">Releases</a>
@@ -91,7 +92,8 @@ speedup lives — do as much other work there as you can.</p>
 <ul>
 <li>A bare <code>join(h);</code> on a value-returning task is fine: it waits and discards.</li>
 </ul>
-<p>Any crossable type can be a task result: every integer width, <code>f64</code>, <code>bool</code>, <code>str</code>,
+<p>Any crossable type can be a task result: every integer width, all four float widths
+(<code>f16</code>, <code>f32</code>, <code>f64</code>, <code>f128</code>), <code>bool</code>, <code>str</code>,
 <code>i128</code>/<code>u128</code>, and <code>aett</code> values.</p>
 <h2>Arguments are copied at the spawn</h2>
 <p>When you write <code>raven greet(name)</code>, the argument is <strong>deep-copied at the moment the spawn
@@ -206,9 +208,10 @@ and multiple consumers on one bridge are fully supported: the bridge's lock seri
 and each value is received <strong>exactly once by exactly one consumer</strong>.</p>
 <h2>What crosses, and what waits</h2>
 <ul>
-<li><strong>Across a spawn or bridge:</strong> every integer width, <code>u64</code>, <code>f64</code>, <code>bool</code>, <code>str</code>,</li>
+<li><strong>Across a spawn or bridge:</strong> every integer width, all four float widths</li>
 </ul>
-<p><code>i128</code>/<code>u128</code>, and <code>aett</code> values. Collections and <code>result</code> don't cross yet.</p>
+<p>(<code>f16</code>, <code>f32</code>, <code>f64</code>, <code>f128</code>), <code>bool</code>, <code>str</code>,
+<code>i128</code>/<code>u128</code>, and <code>aett</code> values. Collections and <code>result</code> don't cross yet.</p>
 <ul>
 <li><strong><code>bridge_new(cap)</code></strong> needs <code>cap &gt;= 1</code>; unbuffered rendezvous channels are a later</li>
 </ul>

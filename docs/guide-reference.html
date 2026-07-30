@@ -29,6 +29,7 @@
       <a href="/">Home</a>
       <a href="/guide">Guide</a>
       <a href="/tour">Tour</a>
+      <a href="/std">Std</a>
       <a href="/rune">Rune</a>
       <a href="/vefna">Vefna</a>
       <a href="/releases">Releases</a>
@@ -38,7 +39,7 @@
   <main>
 
 <h1>Appendix: full reference</h1>
-<p><em><a href="/guide-projects">← 7. Modules and projects</a> · <a href="/guide">Guide index</a></em></p>
+<p><em><a href="/guide-systems">← 8. Systems and OS development</a> · <a href="/guide">Guide index</a></em></p>
 <p>Everything in one place, for looking things up once you know the language.</p>
 <h2>Keywords</h2>
 <p>| Keyword | Purpose |
@@ -86,7 +87,7 @@
 element, <code>table_get</code>, or parenthesized expression — can sit on either side. Strings compare
 by content; <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> order them lexicographically. Comparing a string with a number
 is a clean compile error.</p>
-<p><strong>Boolean expressions are fully chainable (v1.4.0).</strong> <code>&amp;&amp;</code> and <code>||</code> work as values, chain any
+<p><strong>Boolean expressions short-circuit (v1.5.0)</strong> — the right-hand side is not evaluated when the left already decides the answer, so <code>i &lt; len(xs) &amp;&amp; xs[i] == 1</code> is a safe guard. They are also fully chainable: <code>&amp;&amp;</code> and <code>||</code> work as values, chain any
 number of operands, and boolean-returning calls compare against literals:</p>
 <pre><code class="language-torvik">fixed ok: bool = a &amp;&amp; b;
 fixed all: bool = a &amp;&amp; b &amp;&amp; c;
@@ -256,7 +257,7 @@ localhost API.</p>
 <li><a href="/contact">Contact</a> — questions and feedback</li>
 </ul>
 <hr>
-<p><em><a href="/guide-projects">← 7. Modules and projects</a> · <a href="/guide">Guide index</a></em></p>
+<p><em><a href="/guide-systems">← 8. Systems and OS development</a> · <a href="/guide">Guide index</a></em></p>
   </main>
   <footer>
     <nav class="footer-links">

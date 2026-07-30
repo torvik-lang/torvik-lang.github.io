@@ -67,7 +67,7 @@ The project and toolchain manager, written in Torvik.
 The static site generator, written entirely in Torvik — and buildable with a public
 toolchain.
 
-1. Install Torvik (Vefna v1.1.0 builds with **Torvik v1.4.0**):
+1. Install Torvik (Vefna needs at least **Torvik v1.4.0**; newer is fine):
 
    ```
    curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh

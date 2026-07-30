@@ -29,6 +29,7 @@
       <a href="/">Home</a>
       <a href="/guide">Guide</a>
       <a href="/tour">Tour</a>
+      <a href="/std">Std</a>
       <a href="/rune">Rune</a>
       <a href="/vefna">Vefna</a>
       <a href="/releases">Releases</a>
@@ -43,40 +44,69 @@
 and other assets live. The one-line installers below are the recommended way to get set
 up on Linux or Windows.</p>
 <hr>
-<h2>Torvik — v1.4.0</h2>
+<h2>Torvik — v1.5.0</h2>
 <p>The language and compiler.</p>
 <p><strong>Install</strong> &amp;nbsp;
 Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code>
 Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></p>
 <p><strong>Download</strong> &amp;nbsp;
-Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.4.0/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.4.0/torvc-windows-x86_64.exe">Windows (x86-64)</a>
-Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.4.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.4.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.4.0">all assets</a></p>
+Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.0">all assets</a></p>
 <p><strong>What's new</strong></p>
+<p><strong>"The Forge" — systems and OS development.</strong> Torvik can now build a freestanding image
+that boots on bare hardware, with no operating system, no C library, and no runtime
+beneath it. Everything new here is opt-in and <code>unsafe</code>-gated; the safe surface is unchanged.</p>
 <ul>
-<li>Optional (<code>^</code>) and variadic (<code>*</code>) function parameters, with call-site type checking</li>
-<li>Boolean chaining is limit-free — <code>&amp;&amp;</code> / <code>||</code> as values, <code>contains(...) == false</code>, and more</li>
-<li><code>std::net</code> — an opt-in HTTP layer with binary-safe file serving</li>
-<li><code>chr</code> and <code>fs_size</code> builtins; standard library v1.3.0</li>
-<li><code>rune</code> decoupled into its own repository, versioned independently</li>
-<li>Fixes: exhaustive <code>when</code> false positive, boolean-literal argument IR, <code>bool</code> returns,</li>
+<li>Raw pointers (<code>varda&lt;T&gt;</code>), bounds-checked fixed arrays (<code>[T; N]</code>), and <code>shape</code> value</li>
 </ul>
-<p>single-character function names</p>
+<p>structs — a <code>packed shape</code> maps byte-for-byte onto a C struct or hardware descriptor</p>
+<ul>
+<li><code>size_of</code> / <code>align_of</code>, volatile MMIO (<code>load_vol</code> / <code>store_vol</code>), inline assembly</li>
+</ul>
+<p>(<code>galdr</code>), and named x86_64 port intrinsics</p>
+<ul>
+<li><code>torvc --bare</code> freestanding builds, with an allocator hook so heap types work bare —</li>
+</ul>
+<p>plus a complete <a href="/guide-systems">reference kernel and tutorial</a></p>
+<ul>
+<li>Float widths <code>f16</code>, <code>f32</code>, <code>f128</code> alongside <code>f64</code>, with true storage layout</li>
+<li>Hex, binary and underscored integer literals — <code>0xB8000</code>, <code>0b1010_0110</code>, <code>1_000_000</code></li>
+<li>Run mode: <code>torvc file.tv</code> executes a file directly, no binary left behind</li>
+<li>The standard library moved to <a href="https://github.com/torvik-lang/std">its own repository</a></li>
+<li><strong><code>&amp;&amp;</code> and <code>||</code> now short-circuit</strong> — a correctness fix; they previously evaluated both</li>
+</ul>
+<p>sides, so <code>i &lt; len(xs) &amp;&amp; xs[i] == 1</code> could read out of bounds</p>
+<ul>
+<li>Many fixes, including several cases where a user mistake was reported as an internal</li>
+</ul>
+<p>compiler error</p>
 <p><a href="https://github.com/torvik-lang/torvik/releases">All Torvik releases &amp;rarr;</a></p>
 <hr>
-<h2>rune — v1.4.0</h2>
+<h2>rune — v1.5.0</h2>
 <p>The project and toolchain manager. Normally installed with Torvik; see the
 <a href="/rune">rune page</a> for the full command set.</p>
 <p><strong>Install (rune only)</strong> &amp;nbsp;
 Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/rune/main/linux/install.sh | sh</code>
 Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/rune/main/windows/install.ps1 | iex</code></p>
 <p><strong>Download</strong> &amp;nbsp;
-Binary: <a href="https://github.com/torvik-lang/rune/releases/download/v1.4.0/rune-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/download/v1.4.0/rune-windows-x86_64.exe">Windows (x86-64)</a>
-Source: <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.4.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.4.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/tag/v1.4.0">all assets</a></p>
+Binary: <a href="https://github.com/torvik-lang/rune/releases/download/v1.5.0/rune-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/download/v1.5.0/rune-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.5.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/archive/refs/tags/v1.5.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/rune/releases/tag/v1.5.0">all assets</a></p>
 <p><strong>What's new</strong></p>
 <ul>
-<li>rune now lives in its own repository and versions independently of Torvik</li>
-<li><code>rune update</code> checks Torvik and rune separately and updates whichever moved</li>
-<li><code>rune self-update</code> updates just rune</li>
+<li><code>rune run &lt;file.tv&gt; [args...]</code> runs a single file directly, forwarding arguments</li>
+<li>A <code>[build]</code> manifest section — declare a freestanding target once and <code>rune build</code> /</li>
+</ul>
+<p><code>rune run</code> build and launch a kernel</p>
+<ul>
+<li><strong>Major-version gating</strong>: updates stay inside your current major and <em>report</em> a new one</li>
+</ul>
+<p>instead of installing it (<code>rune update v2 --yes</code> opts in)</p>
+<ul>
+<li>Standard-library gating, with <code>rune update --std-major --yes</code> writing the pin into your</li>
+</ul>
+<p>manifest for you</p>
+<ul>
+<li>rune now has its own test suite, so it can be checked without building the compiler</li>
 </ul>
 <blockquote><p><strong>v1.4.0 is rune's first release in its own repository.</strong> Earlier rune versions
 (v1.3.0 and before) shipped as part of Torvik — find those binaries under the matching
@@ -104,6 +134,29 @@ Source: <a href="https://github.com/torvik-lang/vefna/archive/refs/tags/v1.1.0.z
 <hr>
 <p>Looking for older versions or full changelogs? Every project's <strong>releases</strong> page lists
 each version with its notes and downloads.</p>
+<hr>
+<h2>Support policy</h2>
+<p>Every major version is supported for <strong>five years</strong>, in three stages:</p>
+<p>| Stage | Years | What it gets |
+| --- | --- | --- |
+| <strong>Active</strong> | 0 – 3 | New features, bug fixes, security fixes. Minor releases happen here. |
+| <strong>Maintenance</strong> | 3 – 4 | Bug fixes and security fixes. No new features. |
+| <strong>Security</strong> | 4 – 5 | Security fixes only. |</p>
+<h3>Where things stand</h3>
+<p>| Line | Released | Stage | Active until | Maintenance until | End of life |
+| --- | --- | --- | --- | --- | --- |
+| <strong>Torvik 1.x</strong> | 4 Jul 2026 | <strong>Active</strong> | 4 Jul 2029 | 4 Jul 2030 | <strong>4 Jul 2031</strong> |
+| <strong>rune 1.x</strong> | 4 Jul 2026 | <strong>Active</strong> | 4 Jul 2029 | 4 Jul 2030 | <strong>4 Jul 2031</strong> |
+| <strong>Vefna 1.x</strong> | 4 Jul 2026 | <strong>Active</strong> | 4 Jul 2029 | 4 Jul 2030 | <strong>4 Jul 2031</strong> |</p>
+<p>The standard library versions independently but tracks the toolchain line it ships
+with: std 1.x is supported for as long as Torvik 1.x is.</p>
+<p><strong>Nothing stops working at end of life</strong> — a compiler that built your program last
+year will build it next year. What ends is the flow of updates.</p>
+<p><strong>You are never rushed onto a new major.</strong> <code>rune update</code> deliberately keeps you inside
+your current major and only tells you a new one exists, so a 1.x project keeps
+receiving fixes for five years whether or not 2.0 has shipped. Upgrading stays a
+decision you make, not one made for you.</p>
+<p>Full policy: <a href="https://github.com/torvik-lang/torvik/blob/main/SUPPORT.md">SUPPORT.md</a></p>
   </main>
   <footer>
     <nav class="footer-links">

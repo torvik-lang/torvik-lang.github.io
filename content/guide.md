@@ -89,6 +89,10 @@ channels, and why Torvik gives you no way to write a data race.
 Splitting code across files with `apply`, using the standard library, and building and
 shipping projects with `rune`.
 
+**[8. Systems and OS development](/guide-systems)**
+Talk to hardware directly: raw pointers, value structs, volatile memory, inline assembly,
+and freestanding builds — ending with a kernel that boots in QEMU.
+
 **[Appendix: full reference](/guide-reference)**
 Every keyword and operator in one place, the memory model in detail, and an honest list of
 what the language does not do yet.
