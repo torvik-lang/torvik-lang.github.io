@@ -407,9 +407,6 @@ whilst true {
 <p>The classic path from here: a <strong>GDT</strong> of your own, then an <strong>interrupt descriptor table</strong> so
 the keyboard can talk to you, then a <strong>timer</strong>, then <strong>paging</strong> and a real allocator behind
 <code>on_alloc</code>.</p>
-<p>Nothing in Torvik stops you. Interrupt handlers are ordinary functions plus <code>galdr</code>.
-Descriptor tables are <code>packed shape</code>s written into memory through a raw pointer — and
-<code>size_of</code> will confirm you got the layout right before you ever boot.</p>
 <hr>
 <h2>Exercises</h2>
 <ol>
