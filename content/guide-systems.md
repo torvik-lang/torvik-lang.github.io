@@ -553,9 +553,6 @@ The classic path from here: a **GDT** of your own, then an **interrupt descripto
 the keyboard can talk to you, then a **timer**, then **paging** and a real allocator behind
 `on_alloc`.
 
-Nothing in Torvik stops you. Interrupt handlers are ordinary functions plus `galdr`.
-Descriptor tables are `packed shape`s written into memory through a raw pointer — and
-`size_of` will confirm you got the layout right before you ever boot.
 
 ---
 
