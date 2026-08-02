@@ -44,15 +44,19 @@
 and other assets live. The one-line installers below are the recommended way to get set
 up on Linux or Windows.</p>
 <hr>
-<h2>Torvik — v1.5.0</h2>
+<h2>Torvik — v1.5.1</h2>
 <p>The language and compiler.</p>
 <p><strong>Install</strong> &amp;nbsp;
 Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code>
 Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></p>
 <p><strong>Download</strong> &amp;nbsp;
-Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-windows-x86_64.exe">Windows (x86-64)</a>
-Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.0">all assets</a></p>
+Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.1">all assets</a></p>
 <p><strong>What's new</strong></p>
+<p><strong>v1.5.1 — freestanding fixes.</strong> Three <code>--bare</code> link failures: <code>len()</code> on a string,
+integer division and modulo, and string locals all referenced runtime symbols that a
+freestanding build never provided. Hosted programs are unaffected and nothing else
+changes. See the <a href="https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md">changelog</a>.</p>
 <p><strong>"The Forge" — systems and OS development.</strong> Torvik can now build a freestanding image
 that boots on bare hardware, with no operating system, no C library, and no runtime
 beneath it. Everything new here is opt-in and <code>unsafe</code>-gated; the safe surface is unchanged.</p>
