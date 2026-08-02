@@ -12,7 +12,7 @@ up on Linux or Windows.
 
 ---
 
-## Torvik — v1.5.0
+## Torvik — v1.5.1
 
 The language and compiler.
 
@@ -21,10 +21,16 @@ Linux: `curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/lin
 Windows (PowerShell): `iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex`
 
 **Download** &nbsp;
-Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.0/torvc-windows-x86_64.exe)  
-Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.0.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.0)
+Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-windows-x86_64.exe)  
+Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.1)
 
 **What's new**
+
+**v1.5.1 — freestanding fixes.** Three `--bare` link failures: `len()` on a string,
+integer division and modulo, and string locals all referenced runtime symbols that a
+freestanding build never provided. Hosted programs are unaffected and nothing else
+changes. See the [changelog](https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md).
+
 
 **"The Forge" — systems and OS development.** Torvik can now build a freestanding image
 that boots on bare hardware, with no operating system, no C library, and no runtime
