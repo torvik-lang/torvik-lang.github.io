@@ -143,11 +143,11 @@ Always available, no `apply` needed.
 
 ### Files and system
 
-`readfile(p)`, `writefile(p, s)`, `appendfile(p, s)`, `fs_exists(p)`, `fs_size(p)`,
+`readfile(p)`, `writefile(p, s)`, `appendline(p, s)`, `fs_exists(p)`, `fs_size(p)`,
 `fs_mkdir(p)`, `fs_remove(p)`, `fs_copy(a, b)`, `fs_is_dir(p)`, `fs_mtime(p)`,
 `dir_list(p)`, `args()`, `args_get(i)`, `exit(code)`, `sleep(ms)`
 
-Result-returning forms: `try_readfile`, `try_writefile`, `try_appendfile`, `try_fs_copy`.
+Result-returning forms: `try_readfile`, `try_writefile`, `try_appendline`, `try_fs_copy`.
 
 ### Concurrency
 
