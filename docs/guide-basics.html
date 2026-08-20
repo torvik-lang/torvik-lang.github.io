@@ -42,9 +42,17 @@
 <p><em><a href="/guide">← Guide index</a> · Next: <a href="/guide-flow">2. Decisions and loops →</a></em></p>
 <h2>Installing Torvik</h2>
 <p>Torvik needs <strong>clang</strong> on your system — it's the tool Torvik hands its finished machine code
-to for the final link step. Most Linux systems either have it or install it in one command
-(<code>sudo apt install clang</code>, <code>sudo dnf install clang</code>, and so on). On Windows, install
-<a href="https://github.com/mstorsjo/llvm-mingw/releases">LLVM/clang with the MinGW-w64 toolchain</a>.</p>
+to for the final link step. Most Linux systems install it in one command
+(<code>sudo emerge sys-devel/clang</code>, <code>sudo dnf install clang</code>, <code>sudo apt install clang</code>, and so on).</p>
+<p>Two more LLVM tools are worth installing alongside it, because on most distributions they
+ship as <strong>separate packages</strong>: <code>ld.lld</code> and <code>llvm-objcopy</code>, from <strong>lld</strong> and <strong>llvm</strong>.
+Ordinary programs never need them — freestanding builds (<code>torvc --bare</code>, for kernels and
+embedded targets) need both, and finding that out at link time halfway into a project is
+worse than installing them now. On Debian or Ubuntu that is
+<code>sudo apt install clang lld llvm</code>; substitute your package manager as above.</p>
+<p>On Windows, install
+<a href="https://github.com/mstorsjo/llvm-mingw/releases">LLVM/clang with the MinGW-w64 toolchain</a>,
+which bundles all three.</p>
 <p>Then install Torvik itself.</p>
 <p><strong>Linux:</strong></p>
 <pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
