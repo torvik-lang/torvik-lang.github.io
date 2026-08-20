@@ -148,10 +148,10 @@ check contains(line, "error") == false { ... }</code></pre>
 <p><code>ok(v)</code>, <code>err(msg)</code>, <code>err(code, msg)</code>, <code>is_ok(r)</code>, <code>is_err(r)</code>, <code>unwrap(r)</code>,
 <code>unwrap_or(r, default)</code>, <code>err_msg(r)</code>, <code>err_code(r)</code></p>
 <h3>Files and system</h3>
-<p><code>readfile(p)</code>, <code>writefile(p, s)</code>, <code>appendfile(p, s)</code>, <code>fs_exists(p)</code>, <code>fs_size(p)</code>,
+<p><code>readfile(p)</code>, <code>writefile(p, s)</code>, <code>appendline(p, s)</code>, <code>fs_exists(p)</code>, <code>fs_size(p)</code>,
 <code>fs_mkdir(p)</code>, <code>fs_remove(p)</code>, <code>fs_copy(a, b)</code>, <code>fs_is_dir(p)</code>, <code>fs_mtime(p)</code>,
 <code>dir_list(p)</code>, <code>args()</code>, <code>args_get(i)</code>, <code>exit(code)</code>, <code>sleep(ms)</code></p>
-<p>Result-returning forms: <code>try_readfile</code>, <code>try_writefile</code>, <code>try_appendfile</code>, <code>try_fs_copy</code>.</p>
+<p>Result-returning forms: <code>try_readfile</code>, <code>try_writefile</code>, <code>try_appendline</code>, <code>try_fs_copy</code>.</p>
 <h3>Concurrency</h3>
 <p><code>raven f(...)</code>, <code>join(h)</code>, <code>bridge_new(cap)</code>, <code>send(ch, v)</code>, <code>recv(ch)</code>, <code>try_recv(ch)</code>,
 <code>bridge_close(ch)</code></p>

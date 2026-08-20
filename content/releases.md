@@ -12,7 +12,7 @@ up on Linux or Windows.
 
 ---
 
-## Torvik — v1.5.1
+## Torvik — v1.5.3
 
 The language and compiler.
 
@@ -21,16 +21,21 @@ Linux: `curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/lin
 Windows (PowerShell): `iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex`
 
 **Download** &nbsp;
-Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-windows-x86_64.exe)  
-Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.1)
+Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-windows-x86_64.exe)  
+Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.3)
 
 **What's new**
 
-**v1.5.1 — freestanding fixes.** Three `--bare` link failures: `len()` on a string,
-integer division and modulo, and string locals all referenced runtime symbols that a
-freestanding build never provided. Hosted programs are unaffected and nothing else
-changes. See the [changelog](https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md).
-
+**v1.5.3 — "Stillbót", a quiet mending.** A security fix and five correctness bugs, no
+feature changes. `torvc run` refused to pass arguments containing shell syntax after
+an injection was found; hex escapes outside printable ASCII no longer vanish
+(`"\x1b[2J"` kept its escape character); `list<f64>` elements can be assigned;
+`readint` and `readfloat` no longer read freed memory when rejecting bad input; `fmt`
+prints 128-bit values rather than their address; and three builtins stopped reporting
+themselves as undefined when called with the wrong argument count. A new `narrowing`
+warning points at width conversions that 1.x does not enforce. See the
+[changelog](https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md) and
+[advisory](https://github.com/torvik-lang/torvik/blob/main/SECURITY.md).
 
 **"The Forge" — systems and OS development.** Torvik can now build a freestanding image
 that boots on bare hardware, with no operating system, no C library, and no runtime

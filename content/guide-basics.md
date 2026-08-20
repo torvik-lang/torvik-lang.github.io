@@ -10,9 +10,19 @@ description: Install Torvik, write your first program, and learn the raw materia
 ## Installing Torvik
 
 Torvik needs **clang** on your system — it's the tool Torvik hands its finished machine code
-to for the final link step. Most Linux systems either have it or install it in one command
-(`sudo apt install clang`, `sudo dnf install clang`, and so on). On Windows, install
-[LLVM/clang with the MinGW-w64 toolchain](https://github.com/mstorsjo/llvm-mingw/releases).
+to for the final link step. Most Linux systems install it in one command
+(`sudo emerge sys-devel/clang`, `sudo dnf install clang`, `sudo apt install clang`, and so on).
+
+Two more LLVM tools are worth installing alongside it, because on most distributions they
+ship as **separate packages**: `ld.lld` and `llvm-objcopy`, from **lld** and **llvm**.
+Ordinary programs never need them — freestanding builds (`torvc --bare`, for kernels and
+embedded targets) need both, and finding that out at link time halfway into a project is
+worse than installing them now. On Debian or Ubuntu that is
+`sudo apt install clang lld llvm`; substitute your package manager as above.
+
+On Windows, install
+[LLVM/clang with the MinGW-w64 toolchain](https://github.com/mstorsjo/llvm-mingw/releases),
+which bundles all three.
 
 Then install Torvik itself.
 

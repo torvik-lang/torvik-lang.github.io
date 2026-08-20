@@ -336,9 +336,9 @@ each line in split(unwrap(text), "\n") {
 }
 ```
 
-Other file operations include `writefile`, `appendfile`, `fs_exists`, `fs_size`, `fs_mkdir`,
+Other file operations include `writefile`, `appendline`, `fs_exists`, `fs_size`, `fs_mkdir`,
 `fs_remove`, `fs_copy`, `fs_is_dir`, and `dir_list`. The `try_` forms (`try_readfile`,
-`try_writefile`, `try_appendfile`, `try_fs_copy`) return a `result` instead of halting — use
+`try_writefile`, `try_appendline`, `try_fs_copy`) return a `result` instead of halting — use
 those whenever a missing or unreadable file is a realistic outcome, which is nearly always.
 
 ## A complete small tool
