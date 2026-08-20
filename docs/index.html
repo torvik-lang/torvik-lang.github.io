@@ -45,10 +45,20 @@ collector - and concurrency that is safe by construction.</p>
 <p>The compiler (<code>torvc</code>) and the project tool (<code>rune</code>) are both written in Torvik itself.</p>
 <h2>Install</h2>
 <p>Torvik runs on <strong>Linux</strong> and <strong>Windows</strong> (x86-64); macOS is planned once real Apple
-hardware is available for testing. You'll need <code>clang</code> on your PATH - on Linux install
-it from your package manager (<code>sudo apt install clang</code>, Solus: <code>sudo eopkg install
-clang</code>); on Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and
-points you in the right direction if it's missing).</p>
+hardware is available for testing. You'll need <strong>clang</strong> on your PATH, and on most
+Linux distributions <strong>lld</strong> and <strong>llvm</strong> are separate packages worth installing at the
+same time - clang alone is enough for ordinary programs, but freestanding (<code>--bare</code>)
+builds also need <code>ld.lld</code> and <code>llvm-objcopy</code>:</p>
+<ul>
+<li>Gentoo: <code>sudo emerge sys-devel/clang sys-devel/lld sys-devel/llvm</code></li>
+<li>Fedora / RHEL: <code>sudo dnf install clang lld llvm</code></li>
+<li>Debian / Ubuntu: <code>sudo apt install clang lld llvm</code></li>
+<li>Arch: <code>sudo pacman -S clang lld llvm</code></li>
+<li>Solus: <code>sudo eopkg install clang lld llvm</code></li>
+<li>openSUSE: <code>sudo zypper install clang lld llvm</code></li>
+</ul>
+<p>On Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and points you
+in the right direction if it's missing).</p>
 <p>Linux:</p>
 <pre><code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code></pre>
 <p>Windows (PowerShell):</p>
