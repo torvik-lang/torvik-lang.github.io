@@ -14,10 +14,20 @@ The compiler (`torvc`) and the project tool (`rune`) are both written in Torvik 
 ## Install
 
 Torvik runs on **Linux** and **Windows** (x86-64); macOS is planned once real Apple
-hardware is available for testing. You'll need `clang` on your PATH - on Linux install
-it from your package manager (`sudo apt install clang`, Solus: `sudo eopkg install
-clang`); on Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and
-points you in the right direction if it's missing).
+hardware is available for testing. You'll need **clang** on your PATH, and on most
+Linux distributions **lld** and **llvm** are separate packages worth installing at the
+same time - clang alone is enough for ordinary programs, but freestanding (`--bare`)
+builds also need `ld.lld` and `llvm-objcopy`:
+
+- Gentoo: `sudo emerge sys-devel/clang sys-devel/lld sys-devel/llvm`
+- Fedora / RHEL: `sudo dnf install clang lld llvm`
+- Debian / Ubuntu: `sudo apt install clang lld llvm`
+- Arch: `sudo pacman -S clang lld llvm`
+- Solus: `sudo eopkg install clang lld llvm`
+- openSUSE: `sudo zypper install clang lld llvm`
+
+On Windows, LLVM/clang with a MinGW-w64 sysroot (the installer checks and points you
+in the right direction if it's missing).
 
 Linux:
 
