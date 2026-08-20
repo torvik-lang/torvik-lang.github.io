@@ -265,9 +265,9 @@ each line in split(unwrap(text), "\n") {
         echo!(line);
     }
 }</code></pre>
-<p>Other file operations include <code>writefile</code>, <code>appendfile</code>, <code>fs_exists</code>, <code>fs_size</code>, <code>fs_mkdir</code>,
+<p>Other file operations include <code>writefile</code>, <code>appendline</code>, <code>fs_exists</code>, <code>fs_size</code>, <code>fs_mkdir</code>,
 <code>fs_remove</code>, <code>fs_copy</code>, <code>fs_is_dir</code>, and <code>dir_list</code>. The <code>try_</code> forms (<code>try_readfile</code>,
-<code>try_writefile</code>, <code>try_appendfile</code>, <code>try_fs_copy</code>) return a <code>result</code> instead of halting — use
+<code>try_writefile</code>, <code>try_appendline</code>, <code>try_fs_copy</code>) return a <code>result</code> instead of halting — use
 those whenever a missing or unreadable file is a realistic outcome, which is nearly always.</p>
 <h2>A complete small tool</h2>
 <pre><code class="language-torvik">apply std;
