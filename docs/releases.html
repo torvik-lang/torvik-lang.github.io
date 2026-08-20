@@ -44,19 +44,25 @@
 and other assets live. The one-line installers below are the recommended way to get set
 up on Linux or Windows.</p>
 <hr>
-<h2>Torvik — v1.5.1</h2>
+<h2>Torvik — v1.5.3</h2>
 <p>The language and compiler.</p>
 <p><strong>Install</strong> &amp;nbsp;
 Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code>
 Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></p>
 <p><strong>Download</strong> &amp;nbsp;
-Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.1/torvc-windows-x86_64.exe">Windows (x86-64)</a>
-Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.1.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.1">all assets</a></p>
+Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.3">all assets</a></p>
 <p><strong>What's new</strong></p>
-<p><strong>v1.5.1 — freestanding fixes.</strong> Three <code>--bare</code> link failures: <code>len()</code> on a string,
-integer division and modulo, and string locals all referenced runtime symbols that a
-freestanding build never provided. Hosted programs are unaffected and nothing else
-changes. See the <a href="https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md">changelog</a>.</p>
+<p><strong>v1.5.3 — "Stillbót", a quiet mending.</strong> A security fix and five correctness bugs, no
+feature changes. <code>torvc run</code> refused to pass arguments containing shell syntax after
+an injection was found; hex escapes outside printable ASCII no longer vanish
+(<code>"\x1b[2J"</code> kept its escape character); <code>list&lt;f64&gt;</code> elements can be assigned;
+<code>readint</code> and <code>readfloat</code> no longer read freed memory when rejecting bad input; <code>fmt</code>
+prints 128-bit values rather than their address; and three builtins stopped reporting
+themselves as undefined when called with the wrong argument count. A new <code>narrowing</code>
+warning points at width conversions that 1.x does not enforce. See the
+<a href="https://github.com/torvik-lang/torvik/blob/main/CHANGELOG.md">changelog</a> and
+<a href="https://github.com/torvik-lang/torvik/blob/main/SECURITY.md">advisory</a>.</p>
 <p><strong>"The Forge" — systems and OS development.</strong> Torvik can now build a freestanding image
 that boots on bare hardware, with no operating system, no C library, and no runtime
 beneath it. Everything new here is opt-in and <code>unsafe</code>-gated; the safe surface is unchanged.</p>
