@@ -12,7 +12,7 @@ up on Linux or Windows.
 
 ---
 
-## Torvik — v1.5.3
+## Torvik — v1.5.4
 
 The language and compiler.
 
@@ -21,10 +21,21 @@ Linux: `curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/lin
 Windows (PowerShell): `iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex`
 
 **Download** &nbsp;
-Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-windows-x86_64.exe)  
-Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.3)
+Binary: [Linux (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.4/torvc-linux-x86_64) &middot; [Windows (x86-64)](https://github.com/torvik-lang/torvik/releases/download/v1.5.4/torvc-windows-x86_64.exe)  
+Source: [.zip](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.4.zip) &middot; [.tar.gz](https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.4.tar.gz) &middot; [all assets](https://github.com/torvik-lang/torvik/releases/tag/v1.5.4)
 
 **What's new**
+
+**v1.5.4 — "Vörðr", the watcher.** A security release. Every path the compiler put
+on a command line went through a helper that wrapped it in double quotes — which do
+not stop command substitution, so `$(...)` and backticks expanded. Confirmed through
+the `-o` output path and through `HOME`. The helper now refuses shell syntax rather
+than quoting it, covering all seventeen call sites at once. This is the seventh and
+last of a family of injection issues; the
+[advisory](https://github.com/torvik-lang/torvik/blob/main/SECURITY.md) explains what
+changed beyond the fix, and why anyone writing wrappers around `torvc` should check
+their own. **Update if you run torvc from scripts, CI, or anywhere `HOME` is set
+from configuration.**
 
 **v1.5.3 — "Stillbót", a quiet mending.** A security fix and five correctness bugs, no
 feature changes. `torvc run` refused to pass arguments containing shell syntax after
