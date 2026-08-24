@@ -44,15 +44,25 @@
 and other assets live. The one-line installers below are the recommended way to get set
 up on Linux or Windows.</p>
 <hr>
-<h2>Torvik — v1.5.3</h2>
+<h2>Torvik — v1.5.4</h2>
 <p>The language and compiler.</p>
 <p><strong>Install</strong> &amp;nbsp;
 Linux: <code>curl -fsSL https://raw.githubusercontent.com/torvik-lang/torvik/main/linux/install.sh | sh</code>
 Windows (PowerShell): <code>iwr -useb https://raw.githubusercontent.com/torvik-lang/torvik/main/windows/install.ps1 | iex</code></p>
 <p><strong>Download</strong> &amp;nbsp;
-Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.3/torvc-windows-x86_64.exe">Windows (x86-64)</a>
-Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.3.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.3">all assets</a></p>
+Binary: <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.4/torvc-linux-x86_64">Linux (x86-64)</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/download/v1.5.4/torvc-windows-x86_64.exe">Windows (x86-64)</a>
+Source: <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.4.zip">.zip</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/archive/refs/tags/v1.5.4.tar.gz">.tar.gz</a> &amp;middot; <a href="https://github.com/torvik-lang/torvik/releases/tag/v1.5.4">all assets</a></p>
 <p><strong>What's new</strong></p>
+<p><strong>v1.5.4 — "Vörðr", the watcher.</strong> A security release. Every path the compiler put
+on a command line went through a helper that wrapped it in double quotes — which do
+not stop command substitution, so <code>$(...)</code> and backticks expanded. Confirmed through
+the <code>-o</code> output path and through <code>HOME</code>. The helper now refuses shell syntax rather
+than quoting it, covering all seventeen call sites at once. This is the seventh and
+last of a family of injection issues; the
+<a href="https://github.com/torvik-lang/torvik/blob/main/SECURITY.md">advisory</a> explains what
+changed beyond the fix, and why anyone writing wrappers around <code>torvc</code> should check
+their own. <strong>Update if you run torvc from scripts, CI, or anywhere <code>HOME</code> is set
+from configuration.</strong></p>
 <p><strong>v1.5.3 — "Stillbót", a quiet mending.</strong> A security fix and five correctness bugs, no
 feature changes. <code>torvc run</code> refused to pass arguments containing shell syntax after
 an injection was found; hex escapes outside printable ASCII no longer vanish
